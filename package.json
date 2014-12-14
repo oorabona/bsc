@@ -1,0 +1,58 @@
+{
+  "name": "ubs",
+  "version": "0.0.1",
+  "description": "Unified Build System",
+  "main": "./lib/ubs",
+  "scripts": {
+    "build": "./node_modules/.bin/coffee -o lib -c src",
+    "test": "./bin/ubs test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/oorabona/ubs"
+  },
+  "keywords": [
+    "build",
+    "system",
+    "coffee"
+  ],
+  "author": "Olivier ORABONA",
+  "licenses": [
+    {
+      "type": "Apache License 2.0",
+      "url": "https://github.com/oorabona/ubs/blob/master/LICENSE"
+    }
+  ],
+  "bugs": {
+    "url": "https://github.com/oorabona/ubs/issues"
+  },
+  "homepage": "https://github.com/oorabona/ubs",
+  "devDependencies": {
+    "expect.js": "^0.3.1",
+    "mocha": "^2.0.1",
+    "mocha-sprinkles": "^2.0.1",
+    "underscore": "^1.7.0"
+  },
+  "dependencies": {
+    "coffee-script": "^1.8.0",
+    "js-yaml": "^3.2.3",
+    "nopt": "^3.0.1",
+    "q": "^1.1.2",
+    "shelljs": "^0.3.0",
+    "sprintf": "^0.1.5",
+    "strftime": "^0.8.2"
+  },
+  "files": [
+    "build.yml",
+    "lib",
+    "bin/ubs",
+    "test"
+  ],
+  "bin": {
+    "ubs": "bin/ubs"
+  },
+  "preferGlobal": "true",
+  "engines": {
+    "node": ">=0.10.1"
+  }
+}
