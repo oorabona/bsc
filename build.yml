@@ -1,0 +1,19 @@
+init:
+  plugins:
+    - mocha
+settings:
+  version: '0.0.1'
+  toClean: ['lib', 'build']
+  srcPath: 'src'
+  libPath: 'lib'
+build:
+  - echo Building %version ...
+  - coffee -o %libPath -c %srcPath
+test:
+  - task: build
+  - mocha
+install:
+  - task: test
+  - echo Installation complete, you can cd %libPath
+  - pwd
+  - cd lib
