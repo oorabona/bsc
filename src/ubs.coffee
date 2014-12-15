@@ -39,7 +39,6 @@ longOptions =
   debug: Boolean
   "no-colors": Boolean
   colors: Boolean
-  "no-builtins": Boolean
 
 shortOptions =
   b: [ "--build"]
