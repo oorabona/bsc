@@ -24,7 +24,10 @@ Config =
       settings: &settings
         toClean: ['lib']
         toDistclean: ['node_modules']
-
+        exec:
+          cwd:
+          env:
+          stdio:
       clean:
         - exec: rm -rf %toClean
 

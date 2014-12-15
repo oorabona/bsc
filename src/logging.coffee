@@ -47,11 +47,11 @@ error = (text) -> console.error inColor("red", "ERROR: " + text)
 warning = (text) -> console.log inColor("orange", "Warning: " + text)
 notice = (text) -> console.log inColor("yellow", text)
 taskinfo = (text) -> if isVerbose or isDebug then console.log inColor("cyan", text)
-info = (text) -> if isVerbose or isDebug then console.log inColor("purple", text)
+info = (text) -> if isVerbose or isDebug then console.log inColor("green", text)
 debug = (text) ->
   if not isDebug then return
   now = (Date.now() - appStartTime) / 1000.0
-  console.log inColor("green", sprintf.sprintf "[%06.3f] %s", now, text)
+  console.log inColor("purple", sprintf.sprintf "[%06.3f] %s", now, text)
 mark = ->
   console.log inColor("yellow", "----- ") + inColor("brightCyan", strftime("%H:%M:%S [%d-%b-%Y]"))
 

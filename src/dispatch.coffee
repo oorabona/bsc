@@ -42,16 +42,16 @@ Dispatch =
       logging.debug "shell command '#{command}' returned '#{shellCode}'"
       # check return value
       if err = shell.error()?[...-1]
-        throw new Error "Command '#{command}' returned '#{err}'"
+        deferred.reject "Command '#{command}' returned '#{err}'"
       deferred.resolve shellCode ? 'success'
     else
       # i bet this doesn't work on windows.
       command = [ "/bin/sh", "-c", command ]
-      if not settings.env? then settings.env = process.env
-      if not settings.cwd? then settings.cwd = process.cwd()
-      if not settings.stdio? then settings.stdio = "inherit"
+      if not settings.exec.env? then settings.exec.env = process.env
+      if not settings.exec.cwd? then settings.exec.cwd = process.cwd()
+      if not settings.exec.stdio? then settings.exec.stdio = "inherit"
 
-      p = child_process.spawn command[0], command[1...], settings
+      p = child_process.spawn command[0], command[1...], settings.exec
       logging.debug "spawn #{p.pid}: #{util.inspect(command)}"
       p.on "exit", (code, signal) ->
         if signal?

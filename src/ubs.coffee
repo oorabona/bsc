@@ -45,6 +45,7 @@ shortOptions =
   w: [ "--watch" ]
   v: [ "--verbose" ]
   D: [ "--debug" ]
+  t: [ "--tasks" ]
 
 main = ->
   options = parseOptions process.argv
@@ -53,7 +54,12 @@ main = ->
 
   run(options)
   .then (result) ->
-    logging.info "Build complete: #{result}"
+    if options.tasks
+      logging.notice "Tasks found in #{options.build}:"
+      result.forEach (task) ->
+        logging.notice "- #{task}" if task isnt 'settings'
+    else
+      logging.notice "Build complete: #{result.join '\n'}"
     process.exit result
   , (error) ->
     logging.error error.message
@@ -65,19 +71,18 @@ main = ->
     return
 
 run = (options) ->
-  logging.debug "Command-line options #{util.inspect _.omit(options, "argv")}: #{options.argv.remain}"
+  logging.debug "Command-line options #{util.inspect _.omit(options, "argv")}: tasks #{options.argv.remain}"
   Q.fcall (resolve) ->
     rules = unless options["no-builtins"] then Config.builtinRules() else {}
     tasklist = parseTaskList options, rules.settings
     if tasklist[0].length is 0
-      options.tasks = [ DEFAULT_TASK ]
+      options.tasklist = [ DEFAULT_TASK ]
     else
-      options.tasks = tasklist[0]
-    rules
-  .then (rules) ->
+      options.tasklist = tasklist[0]
+
     logging.debug "Loaded rules: #{util.inspect rules}"
     # Load build.yml or result of options.build
-    buildFile = options.build ? (process.env["UBS_BUILD"] ? Config.DEFAULT_BUILD_FILE)
+    buildFile = options.build
 
     Q.Promise (resolve, reject, notify) ->
       fs.readFile buildFile, "utf-8", (error, code = {}) ->
@@ -91,15 +96,35 @@ run = (options) ->
     # If we have init then parse it before all other action
     # At the moment only 'plugins' is recognized but it may allow future
     # extensions hopefully quite easily !
-    if tasks.init?
-      tasks.init.plugins?.forEach (plugin) ->
+    if tasks.init?.plugins
+      # If build specifies additional pluginPath then add them now
+      addPluginPath = (path) ->
+        plugins.addPath path
+        logging.debug "Plugin path #{path} added."
+        return
+
+      if tasks.settings.pluginPath instanceof Array
+        tasks.settings.pluginPath.forEach addPluginPath
+      else if tasks.settings.pluginPath
+        addPluginPath tasks.settings.pluginPath
+
+      logging.info "Plugins loading path: #{plugins.getPaths()}"
+
+      # Plugin load is asynchronous
+      Q.all tasks.init.plugins.map (plugin) ->
         logging.info "Loading plugin: #{plugin}"
-        plugins.load plugin
+        plugins.load plugin, tasks
+    else
+      [tasks]
+  .then (context) ->
+    if options.tasks
+      return Object.keys context[0]
 
-    logging.debug "Looking for targets: #{options.tasks}"
+    logging.debug "Looking for targets: #{options.tasklist}"
 
+    tasks = context[0]
     runList = []
-    for task in options.tasks then do (task) ->
+    for task in options.tasklist then do (task) ->
       pipeline = tasks[task]
       unless pipeline
         throw new Error "Could not find task #{task}"
@@ -118,10 +143,16 @@ run = (options) ->
 
     logging.debug "Sequence loaded: #{util.inspect runList}"
 
-    funcs = []
-    for item in runList
-      funcs.push Dispatch["run_#{item.type}"](item.cmd, tasks.settings)
-    funcs.reduce Q.when, Q()
+    results = []
+    next = (runList) ->
+      item = runList.shift()
+      return unless item
+      Dispatch["run_#{item.type}"](item.cmd, tasks.settings).then (result) ->
+        results.push result
+        next runList
+      , (error) ->
+        throw "While processing #{item.cmd}: #{util.inspect error}"
+    next runList
 
 parseOptions = (argv, slice) ->
   options = nopt(longOptions, shortOptions, argv, slice)
@@ -129,7 +160,7 @@ parseOptions = (argv, slice) ->
   if options["no-colors"] then logging.useColors(false)
   if options.verbose then logging.setVerbose(true)
   if options.debug then logging.setDebug(true)
-  if options.folder then process.chdir(options.folder)
+  options.build ?= process.env["UBS_BUILD"] ? Config.DEFAULT_BUILD_FILE
   options
 
 parseTaskList = (options, settings={}) ->
@@ -163,12 +194,12 @@ general options are listed below. task-settings are all of the form
 "<name>=<value>".
 example:
   ubs -b #{Config.DEFAULT_BUILD_FILE} build debug=true test
-  loads rules from #{Config.DEFAULT_RULES_FILE}, adds { debug: "true" } to the
+  loads build from #{Config.DEFAULT_BUILD_FILE}, adds { debug: "true" } to the
   global settings object, then runs task "build" followed by task "test".
 options:
   --buildfile FILENAME (-b)
       use a specific rules file (default: #{Config.DEFAULT_BUILD_FILE})
-  --tasks
+  --tasks (-t)
       show the list of tasks and their descriptions
   --watch (-w)
       keep running (until killed), watching for changed files

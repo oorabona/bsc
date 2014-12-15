@@ -2,18 +2,23 @@ init:
   plugins:
     - mocha
 settings:
+  pluginPath: './src/plugins'
   version: '0.0.1'
   toClean: ['lib', 'build']
   srcPath: 'src'
   libPath: 'lib'
+  mocha:
+    bin: 'mocha'
+    useCoffee: true
+prebuild:
+  - npm update
 build:
+  - task: prebuild
   - echo Building %version ...
   - coffee -o %libPath -c %srcPath
 test:
   - task: build
-  - mocha
+  - task: mocha-test
 install:
   - task: test
-  - echo Installation complete, you can cd %libPath
-  - pwd
-  - cd lib
+  - echo Installation complete, you can 'cd %libPath'

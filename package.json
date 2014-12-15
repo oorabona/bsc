@@ -1,6 +1,6 @@
 {
   "name": "ubs",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Unified Build System",
   "main": "./lib/ubs",
   "scripts": {
@@ -38,6 +38,7 @@
     "js-yaml": "^3.2.3",
     "nopt": "^3.0.1",
     "q": "^1.1.2",
+    "sandbox-runner": "^0.1.1",
     "shelljs": "^0.3.0",
     "sprintf": "^0.1.5",
     "strftime": "^0.8.2"
