@@ -1,9 +1,10 @@
 init:
   plugins:
     - mocha
+    - packagejson
+    - clean
 settings:
   pluginPath: './src/plugins'
-  version: '0.0.1'
   toClean: ['lib', 'build']
   srcPath: 'src'
   libPath: 'lib'
@@ -13,8 +14,7 @@ settings:
 prebuild:
   - npm update
 build:
-  - task: prebuild
-  - echo Building %version ...
+  - echo Building %name version %version ...
   - coffee -o %libPath -c %srcPath
 test:
   - task: build
