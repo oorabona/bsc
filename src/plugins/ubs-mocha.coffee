@@ -1,12 +1,11 @@
 ###
 Mocha plugin for UBS
 
-It adds just two settings by default:
-settings:
-  mocha:
-    bin: './node_modules/.bin/mocha'
-    opts: ''
+This plugin enables you to run Mocha based tests, with support of Coffeescript
+if needs be.
 
+It is also a basic example on how to run an external command with variables,
+mixing Coffee and YAML.
 ###
 
 @settings =
