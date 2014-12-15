@@ -47,11 +47,13 @@ Dispatch =
     else
       # i bet this doesn't work on windows.
       command = [ "/bin/sh", "-c", command ]
-      if not settings.exec.env? then settings.exec.env = process.env
-      if not settings.exec.cwd? then settings.exec.cwd = process.cwd()
-      if not settings.exec.stdio? then settings.exec.stdio = "inherit"
 
-      p = child_process.spawn command[0], command[1...], settings.exec
+      execSettings = settings.exec or {}
+      execSettings.env ?= process.env
+      execSettings.cwd ?= process.cwd()
+      execSettings.stdio ?= "inherit"
+
+      p = child_process.spawn command[0], command[1...], execSettings
       logging.debug "spawn #{p.pid}: #{util.inspect(command)}"
       p.on "exit", (code, signal) ->
         if signal?
