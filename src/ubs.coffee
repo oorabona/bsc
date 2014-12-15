@@ -73,14 +73,12 @@ main = ->
 run = (options) ->
   logging.debug "Command-line options #{util.inspect _.omit(options, "argv")}: tasks #{options.argv.remain}"
   Q.fcall (resolve) ->
-    rules = unless options["no-builtins"] then Config.builtinRules() else {}
-    tasklist = parseTaskList options, rules.settings
+    tasklist = parseTaskList options
     if tasklist[0].length is 0
       options.tasklist = [ DEFAULT_TASK ]
     else
       options.tasklist = tasklist[0]
 
-    logging.debug "Loaded rules: #{util.inspect rules}"
     # Load build.yml or result of options.build
     buildFile = options.build
 
@@ -88,7 +86,7 @@ run = (options) ->
       fs.readFile buildFile, "utf-8", (error, code = {}) ->
         reject(new Error error) if error
 
-        resolve recursiveMerge rules, yaml.safeLoad code, yaml.JSON_SCHEMA
+        resolve yaml.safeLoad code, yaml.JSON_SCHEMA
 
   .then (tasks) ->
     logging.debug "Tasks #{util.inspect tasks, undefined, 4}"
