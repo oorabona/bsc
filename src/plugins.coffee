@@ -54,28 +54,23 @@ Plugins =
           if fs.existsSync(filename) then return filename
     return "ubs-#{pluginName}"
   load: (pluginName, context) ->
-    logging.debug "Trying to load #{pluginName}"
+    logging.debug "Trying to load plugin '#{pluginName}'"
     foundPlugin = @find pluginName
     logging.debug "Plugin found: #{foundPlugin}"
     # check extension and try to eval
-    ext = foundPlugin.split('.').pop()
+    ext = path.extname(foundPlugin)[1...]
 
-    Q.Promise (resolve, reject, notify) ->
-      fs.readFile foundPlugin, "utf-8", (error, code) ->
-        reject(new Error error) if error
+    # If no ext, it might be an already installed npm module.
+    unless ext
+      try
+        pContext = require foundPlugin
+      catch e
+        throw new Error "Could not find plugin '#{foundPlugin}' in NPM modules"
 
-        pContext = switch ext
-          when 'coffee'
-            logging.debug "Loading coffee file"
-            sandbox.run coffee.compile code.toString(), bare: true
-          when 'js'
-            logging.debug "Loading JS file"
-            sandbox.run coffee.compile code.toString(), bare: true
-          when 'yaml'
-            logging.debug "Loading YAML file"
-            yaml.safeLoad code, yaml.JSON_SCHEMA
-          else
-            reject "Something went wrong very badly when trying to load #{pluginName}, #{ext} not found!"
+      # If we have something but seems empty, throw
+      if pContext instanceof Object
+        unless pContext.settings or pContext.rules
+          throw new Error "Plugin empty or bad: #{pluginName} (#{foundPlugin})"
 
         if pContext.settings
           settings = if typeof pContext.settings is 'function'
@@ -92,7 +87,46 @@ Plugins =
 
           # Make sure settings is not overwritten by rules.
           recursiveMerge context, _.omit(rules, 'settings'), false
+        return Q context
 
-        resolve context
+    Q.Promise (resolve, reject, notify) ->
+      fs.readFile foundPlugin, "utf-8", (error, code) ->
+        reject(new Error error) if error
+
+        try
+          pContext = switch ext
+            when 'coffee'
+              logging.debug "Loading coffee file #{foundPlugin}"
+              sandbox.run coffee.compile code.toString(), bare: true
+            when 'js'
+              logging.debug "Loading JS file #{foundPlugin}"
+              sandbox.run code.toString()
+            when 'yaml'
+              logging.debug "Loading YAML file #{foundPlugin}"
+              pluginCtx = yaml.safeLoad code, yaml.JSON_SCHEMA
+              resolve recursiveMerge context, pluginCtx
+            else
+              # No ext => let's try to 'require' it (might be an installed module)
+              throw new Error "Could not load #{pluginName}: #{foundPlugin} not found!"
+
+          if pContext.settings
+            settings = if typeof pContext.settings is 'function'
+              pContext.settings()
+            else pContext.settings or {}
+            recursiveMerge context.settings, settings, false
+          if pContext.rules
+            rules = if typeof pContext.rules is 'function'
+              pContext.rules context.settings
+            else pContext.rules or {}
+
+            if 'string' is toType rules
+              rules = yaml.safeLoad rules, yaml.JSON_SCHEMA
+
+            # Make sure settings is not overwritten by rules.
+            recursiveMerge context, _.omit(rules, 'settings'), false
+
+          resolve context
+        catch e
+          reject e
 
 module.exports = Plugins
