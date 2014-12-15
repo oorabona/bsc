@@ -20,5 +20,5 @@ test:
   - task: build
   - task: mocha-test
 install:
-  - task: test
+  - task: build
   - echo Installation complete, you can 'cd %libPath'
