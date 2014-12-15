@@ -178,15 +178,17 @@ parseTaskList = (options, settings={}) ->
   [ tasklist, settings ]
 
 showVersion = ->
-  console.log "ubs version #{Config.version()}"
+  console.log "ubs version #{VERSION}"
   0
 
 showHelp = ->
   console.log HELP
   0
 
+exports.VERSION = VERSION = JSON.parse(fs.readFileSync('package.json', 'utf8')).version
+
 HELP = """
-ubs #{Config.version()}
+ubs #{VERSION}
 usage: ubs [options] [task-setting]* [task-name]*
 general options are listed below. task-settings are all of the form
 "<name>=<value>".
