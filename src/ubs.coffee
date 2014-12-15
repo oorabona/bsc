@@ -13,7 +13,6 @@ Q = require 'q'
 sprintf = require 'sprintf'
 util = require 'util'
 vm = require 'vm'
-CoffeeScript = require 'coffee-script'
 yaml = require 'js-yaml'
 _ = require 'underscore'
 
@@ -23,6 +22,8 @@ logging = require "./logging"
 {Config} = require "./config"
 Dispatch = require "./dispatch"
 plugins = require "./plugins"
+
+exports.VERSION = VERSION = require('../package.json').version
 
 SETTING_RE = /^(\w[-\.\w]*)=(.*)$/
 TASK_REGEX = /^[a-z][-a-z0-9_]*$/
@@ -184,8 +185,6 @@ showVersion = ->
 showHelp = ->
   console.log HELP
   0
-
-exports.VERSION = VERSION = JSON.parse(fs.readFileSync('package.json', 'utf8')).version
 
 HELP = """
 ubs #{VERSION}
