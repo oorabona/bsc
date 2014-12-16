@@ -21,6 +21,7 @@ buildPluginPaths = ->
   pluginPaths = [
     "#{home}/.ubs/plugins"
     "#{process.cwd()}/.ubs/plugins"
+    "#{__dirname}/plugins"
   ]
   if process.env["UBS_PATH"]? then pluginPaths.push process.env["UBS_PATH"]
   pluginPaths = pluginPaths.map (folder) -> path.resolve(folder)
