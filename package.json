@@ -1,10 +1,9 @@
 {
   "name": "ubs",
-  "version": "0.2.0",
+  "version": "0.2.5",
   "description": "Unified Build System",
   "main": "./lib/ubs",
   "scripts": {
-    "build": "./node_modules/.bin/coffee -o lib -c src",
     "test": "./bin/ubs test"
   },
   "repository": {
@@ -14,7 +13,14 @@
   "keywords": [
     "build",
     "system",
-    "coffee"
+    "coffee",
+    "server",
+    "tool",
+    "make",
+    "scaffold",
+    "async",
+    "task",
+    "cli"
   ],
   "author": "Olivier ORABONA",
   "licenses": [
