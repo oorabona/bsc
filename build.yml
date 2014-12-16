@@ -4,7 +4,6 @@ init:
     - packagejson
     - clean
 settings:
-  toClean: ['lib', 'build']
   srcPath: 'src'
   libPath: 'lib'
   mocha:
