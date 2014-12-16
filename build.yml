@@ -1,8 +1,14 @@
+# The init part, checked first and looks for plugins to load (in order, but order
+# in this example does not really matter).
 init:
   plugins:
     - mocha
     - packagejson
     - clean
+# It is the place to set environment variables. Plugins can add extra key=value
+# settings, as for Mocha where 'bin' and 'useCoffe'. Mocha options are modified
+# by useCoffee then propagated when called.
+# 'clean' plugin adds settings and clean tasks for us. No need to modify them here :)
 settings:
   srcPath: 'src'
   libPath: 'lib'
@@ -11,12 +17,19 @@ settings:
     useCoffee: true
 prebuild:
   - npm update
+# Note that you can call shell commands
+# %name and %version are variables from settings above. They are string replaced
+# before running command.
 build:
   - echo Building %name version %version ...
   - coffee -o %libPath -c %srcPath/*.coffee
+# Sometimes you rely on other tasks, so that is the way you call them.
+# Here mocha-test is a rule created by the 'mocha' plugin
 test:
   - task: build
   - task: mocha-test
+# You see below a quite complete list of what you can actually achieve with UBS.
+# Stay tuned !
 install:
   - task: build
   - echo Moving plugins to lib/plugins folder
