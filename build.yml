@@ -4,7 +4,6 @@ init:
     - packagejson
     - clean
 settings:
-  pluginPath: './src/plugins'
   toClean: ['lib', 'build']
   srcPath: 'src'
   libPath: 'lib'
@@ -15,10 +14,13 @@ prebuild:
   - npm update
 build:
   - echo Building %name version %version ...
-  - coffee -o %libPath -c %srcPath
+  - coffee -o %libPath -c %srcPath/*.coffee
 test:
   - task: build
   - task: mocha-test
 install:
   - task: build
+  - echo Moving plugins to lib/plugins folder
+  - mkdir %libPath/plugins
+  - cp %srcPath/plugins/* %libPath/plugins/
   - echo Installation complete, you can 'cd %libPath'
