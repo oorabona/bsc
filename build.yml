@@ -8,7 +8,6 @@ init:
 # It is the place to set environment variables. Plugins can add extra key=value
 # settings, as for Mocha where 'bin' and 'useCoffe'. Mocha options are modified
 # by useCoffee then propagated when called.
-# 'clean' plugin adds settings and clean tasks for us. No need to modify them here :)
 settings:
   srcPath: 'src'
   libPath: 'lib'
@@ -26,13 +25,15 @@ build:
 # Sometimes you rely on other tasks, so that is the way you call them.
 # Here mocha-test is a rule created by the 'mocha' plugin
 test:
-  - task: build
+  - task: install
   - task: mocha-test
-# You see below a quite complete list of what you can actually achieve with UBS.
-# Stay tuned !
+# Splitted install and install_plugins because building UBS requires these plugins
+# to be installed first hand. This build.yml needs them in their expected places.
 install:
+  - task: install_plugins
   - task: build
+install_plugins:
   - echo Moving plugins to lib/plugins folder
-  - mkdir %libPath/plugins
+  - mkdir -p %libPath/plugins
   - cp %srcPath/plugins/* %libPath/plugins/
   - echo Installation complete, you can 'cd %libPath'
