@@ -1,6 +1,6 @@
 {
   "name": "ubs",
-  "version": "0.2.5-0",
+  "version": "0.2.6",
   "description": "Unified Build System",
   "main": "./lib/ubs",
   "scripts": {
@@ -20,7 +20,9 @@
     "scaffold",
     "async",
     "task",
-    "cli"
+    "cli",
+    "yaml",
+    "plugin"
   ],
   "author": "Olivier ORABONA",
   "licenses": [
