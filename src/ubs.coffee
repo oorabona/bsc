@@ -91,6 +91,11 @@ run = (options) ->
   .then (tasks) ->
     logging.debug "Tasks #{util.inspect tasks, undefined, 4}"
 
+    # That may happen, log for informational purposes only.
+    unless tasks.settings
+      logging.info 'Settings empty. Using defaults.'
+      tasks.settings = {}
+
     # If we have init then parse it before all other action
     # At the moment only 'plugins' is recognized but it may allow future
     # extensions hopefully quite easily !
