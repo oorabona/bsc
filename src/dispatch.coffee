@@ -48,12 +48,12 @@ Dispatch =
       # i bet this doesn't work on windows.
       command = [ "/bin/sh", "-c", command ]
 
-      settings.exec ?=
-        env: process.env
-        cwd: process.cwd()
-        stdio: "inherit"
+      localSettings = settings.exec or {}
+      localSettings.env ?= process.env
+      localSettings.cwd ?= process.cwd()
+      localSettings.stdio ?= "inherit"
 
-      p = child_process.spawn command[0], command[1...], settings.exec
+      p = child_process.spawn command[0], command[1...], localSettings
       logging.debug "spawn #{p.pid}: #{util.inspect(command)}"
       p.on "exit", (code, signal) ->
         if signal?
