@@ -8,7 +8,10 @@ init:
 # It is the place to set environment variables. Plugins can add extra key=value
 # settings, as for Mocha where 'bin' and 'useCoffe'. Mocha options are modified
 # by useCoffee then propagated when called.
+# We tell 'clean' package to not remove 'lib' globally but only the core build.
+# This allows plugins to remain intact for next build.
 settings:
+  cleanPath: ['lib/*.js']
   srcPath: 'src'
   libPath: 'lib'
   mocha:
