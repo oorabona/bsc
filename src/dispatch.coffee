@@ -10,7 +10,7 @@ REPLACE_SETTING_RE = /\%(\w[-\.\w]*)/g
 
 # commands to copy from shelljs into globals.
 ShellCommands = [
-  "cat", "cd", "chmod", "cp", "dirs", "echo", "env", "exit", "find", "grep",
+  "cat", "cd", "chmod", "cp", "dirs", "env", "exit", "find", "grep",
   "ls", "mkdir", "mv", "popd", "pushd", "pwd", "rm", "sed", "test", "which"
 ]
 
@@ -48,12 +48,12 @@ Dispatch =
       # i bet this doesn't work on windows.
       command = [ "/bin/sh", "-c", command ]
 
-      execSettings = settings.exec or {}
-      execSettings.env ?= process.env
-      execSettings.cwd ?= process.cwd()
-      execSettings.stdio ?= "inherit"
+      settings.exec ?=
+        env: process.env
+        cwd: process.cwd()
+        stdio: "inherit"
 
-      p = child_process.spawn command[0], command[1...], execSettings
+      p = child_process.spawn command[0], command[1...], settings.exec
       logging.debug "spawn #{p.pid}: #{util.inspect(command)}"
       p.on "exit", (code, signal) ->
         if signal?
