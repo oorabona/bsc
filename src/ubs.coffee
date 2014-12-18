@@ -25,10 +25,6 @@ plugins = require "./plugins"
 
 exports.VERSION = VERSION = require('../package.json').version
 
-SETTING_RE = /^(\w[-\.\w]*)=(.*)$/
-TASK_REGEX = /^[a-z][-a-z0-9_]*$/
-DEFAULT_TASK = 'install'
-
 longOptions =
   build: [ path, null ]
   watch: Boolean
@@ -75,7 +71,7 @@ run = (options) ->
   Q.fcall (resolve) ->
     tasklist = parseTaskList options
     if tasklist[0].length is 0
-      options.tasklist = [ DEFAULT_TASK ]
+      options.tasklist = [ Config.DEFAULT_TASK ]
     else
       options.tasklist = tasklist[0]
 
@@ -169,9 +165,9 @@ parseOptions = (argv, slice) ->
 parseTaskList = (options, settings={}) ->
   tasklist = []
   for word in options.argv.remain
-    if word.match TASK_REGEX
+    if word.match Config.TASK_REGEX
       tasklist.push word
-    else if (m = word.match SETTING_RE)
+    else if (m = word.match Config.SETTING_RE)
       segments = m[1].split(".")
       obj = settings
       for segment in segments[0...-1]

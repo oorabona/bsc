@@ -4,9 +4,8 @@ Q = require 'q'
 util = require 'util'
 
 logging = require './logging'
+{Config} = require './config'
 {toType,recursiveMerge} = require './utils'
-
-REPLACE_SETTING_RE = /\%(\w[-\.\w]*)/g
 
 # commands to copy from shelljs into globals.
 ShellCommands = [
@@ -17,7 +16,7 @@ ShellCommands = [
 Dispatch =
   run_exec: (command, settings) ->
     logging.info "+ #{command}"
-    matches = command.match REPLACE_SETTING_RE
+    matches = command.match Config.REPLACE_SETTING_RE
 
     if matches
       matches.forEach (settingToReplace) ->
@@ -69,5 +68,8 @@ Dispatch =
 
       promise.process = p
     promise
+
+  run_env: (command, settings) ->
+    return
 
 module.exports = Dispatch
