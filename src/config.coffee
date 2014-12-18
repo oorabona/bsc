@@ -3,7 +3,12 @@ fs = require 'fs'
 path = require 'path'
 
 Config =
-  DEFAULT_RULES_FILE: 'rules.coffee'
+  SETTING_RE: /^(\w[-\.\w]*)=(.*)$/
+  TASK_REGEX: /^[a-z][-a-z0-9_]*$/
+  DEFAULT_TASK: 'install'
+
+  REPLACE_SETTING_RE: /\%(\w[-\.\w]*)/g
+
   DEFAULT_BUILD_FILE: 'build.yml'
   monitor: (value) ->
     if value? then @_monitor = value
