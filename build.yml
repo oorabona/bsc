@@ -38,5 +38,5 @@ install:
 install_plugins:
   - echo Moving plugins to lib/plugins folder
   - mkdir -p %libPath/plugins
-  - cp %srcPath/plugins/* %libPath/plugins/
+  - cp -f %srcPath/plugins/* %libPath/plugins/
   - echo Installation complete, you can 'cd %libPath'
