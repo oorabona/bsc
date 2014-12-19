@@ -10,8 +10,8 @@ _ = require 'underscore'
 # breaking change in coffee-script 1.7
 require 'coffee-script/register'
 
-logging = require("./logging")
-{toType,recursiveMerge} = require './utils'
+logging = require "./logging"
+{toType, recursiveMerge} = require './utils'
 
 plugins = {}
 pluginPaths = []
