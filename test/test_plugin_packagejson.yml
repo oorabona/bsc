@@ -1,0 +1,5 @@
+init:
+  plugins:
+    - "packagejson"
+test:
+  - echo Build version %version

@@ -1,5 +1,5 @@
 ###
-Run the binary and make sure example build provide expected results
+Run the binary and check results returned by example build.yml test cases
 ###
 
 expect = require 'expect.js'
@@ -12,7 +12,7 @@ future = mocha_sprinkles.future
 
 binubs = "#{process.cwd()}/bin/ubs"
 
-describe 'UBS', ->
+describe 'Bootstrap tests', ->
   it "responds to --help", future ->
     exec("#{binubs} --help").then (p) ->
       expect(p.stderr.toString()).to.be("")
@@ -25,7 +25,13 @@ describe 'UBS', ->
     , (p) ->
       expect(p.stderr.toString()).to.match /ENOENT/
 
-  it 'should display "Hello World!"', future ->
+  it 'should be able to output log messages', future ->
     exec("#{binubs} -b test/helloworld.yml test").then (p) ->
-      expect(p.stderr.toString()).to.be("")
+      expect(p.stderr.toString()).to.be("ERROR: error level\n")
       expect(p.stdout.toString()).to.match /Hello World!/
+
+describe 'Plugins', ->
+  describe 'Package JSON', ->
+    it 'should be able to output version from packagejson', future ->
+      exec("#{binubs} -b test/test_plugin_packagejson.yml test").then (p) ->
+        expect(p.stdout.toString()).to.match /version [0-9]+\.[0-9]+/
