@@ -5,7 +5,7 @@ util = require 'util'
 
 logging = require './logging'
 {Config} = require './config'
-{toType,recursiveMerge} = require './utils'
+Utils = require './utils'
 
 # commands to copy from shelljs into globals.
 ShellCommands = [
@@ -25,7 +25,7 @@ Dispatch =
         unless settingValue = settings[lookupSetting]
           throw new Error "Setting '#{lookupSetting}' not found for command '#{command}!'"
 
-        if 'array' is toType settingValue
+        if 'array' is Utils.toType settingValue
           settingValue = settingValue.join ' '
 
         command = command.replace settingToReplace, settingValue
@@ -70,6 +70,52 @@ Dispatch =
     promise
 
   run_env: (command, settings) ->
-    return
+    logging.info "+ #{command}"
+    envSettings = settings.exec or {}
+    envSettings.env ?= process.env
+
+    if m = command.match Config.SETTING_RE
+      segments = m[1].split "."
+      for segment in segments[0...-1]
+        envSettings.env = (envSettings.env[segment] or= {})
+      envSettings.env[segments[segments.length - 1]] = m[2]
+    else
+      throw new Error "Invalid environment setting: #{env_kv}"
+
+    Q true
+
+  # Log things :)
+  # Command may have a subkey indicating log level (by default notice).
+  # Ex:
+  #   - log: "This is a 'notice' message version %version"
+  #   - log: warn: "This is a warning !"
+  #   - log: debug: "This will be shown in debug mode only."
+  run_log: (command, settings) ->
+    if "string" is Utils.toType command
+      level = "notice"
+      output = command
+    else
+      cmdKeys = Object.keys command
+      unless level = cmdKeys[0]
+        throw new Error "#{level} in #{command} is invalid!"
+
+      output = command[level]
+
+    matches = output.match Config.REPLACE_SETTING_RE
+
+    if matches
+      matches.forEach (settingToReplace) ->
+        # Remove leading '%'
+        lookupSetting = settingToReplace[1...]
+        unless settingValue = settings[lookupSetting]
+          throw new Error "Setting '#{lookupSetting}' not found for command '#{output}!'"
+
+        if 'array' is Utils.toType settingValue
+          settingValue = settingValue.join ' '
+
+        output = output.replace settingToReplace, settingValue
+
+    logging[level] output
+    Q true
 
 module.exports = Dispatch

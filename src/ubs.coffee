@@ -16,7 +16,7 @@ vm = require 'vm'
 yaml = require 'js-yaml'
 _ = require 'underscore'
 
-{toType,recursiveMerge} = require './utils'
+Utils = require './utils'
 
 logging = require "./logging"
 {Config} = require "./config"
@@ -130,15 +130,19 @@ run = (options) ->
       loop
         step = pipeline.shift()
         break unless step
-        if 'string' is toType step
+        if 'string' is Utils.toType step
           runList.push type: 'exec', cmd: step
         else if step.exec
           runList.push type: 'exec', cmd: step.exec
+        else if step.env
+          runList.push type: 'env', cmd: step.env
+        else if step.log
+          runList.push type: 'log', cmd: step.log
         else if step.task
           pipeline = tasks[step.task].concat pipeline
           logging.debug "New dependant task #{step.task}"
         else
-          throw new Error "Action unrecognized: #{step}"
+          throw new Error "Action unrecognized: #{util.inspect step}"
 
     logging.debug "Sequence loaded: #{util.inspect runList}"
 
@@ -155,10 +159,10 @@ run = (options) ->
 
 parseOptions = (argv, slice) ->
   options = nopt(longOptions, shortOptions, argv, slice)
-  if options.colors then logging.useColors(true)
-  if options["no-colors"] then logging.useColors(false)
-  if options.verbose then logging.setVerbose(true)
-  if options.debug then logging.setDebug(true)
+  if options.colors then Config.useColors true
+  if options["no-colors"] then Config.useColors false
+  if options.verbose then Config.setVerbose true
+  if options.debug then Config.setDebug true
   options.build ?= process.env["UBS_BUILD"] ? Config.DEFAULT_BUILD_FILE
   options
 
