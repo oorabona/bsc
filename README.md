@@ -1,10 +1,9 @@
 # Unified Build System
 
-This package has been greatly inspired by what is generally used for NodeJS
-projects.
+> 'Write as little code as you can'
+-- Yoda
 
-But whether [Grunt](http://gruntjs.com) or [Cake](http://www.coffeescript.org)
-were not really convincing: so much more code to write !
+This package is meant to avoid all the extra coding you would need to do whether you use [Grunt](http://gruntjs.com), [Cake](http://www.coffeescript.org) or [Gulp](http://gulpjs.com).
 
 A very different design pattern is used in @robey [plz](https://github.com/robey/plz).
 It gave a lot of ideas you can find in this code and was a great code base !
@@ -30,7 +29,7 @@ Targets will be run in sequence and depending tasks will be automatically added.
 
 ```shell
 $ ubs --help
-ubs 0.2.5
+ubs 0.3.0
 usage: ubs [options] [task-setting]* [task-name]*
 general options are listed below. task-settings are all of the form
 "<name>=<value>".
@@ -76,8 +75,10 @@ init:
 # It is the place to set environment variables. Plugins can add extra key=value
 # settings, as for Mocha where 'bin' and 'useCoffe'. Mocha options are modified
 # by useCoffee then propagated when called.
-# 'clean' plugin adds settings and clean tasks for us. No need to modify them here :)
+# We tell 'clean' package to not remove 'lib' globally but only the core build.
+# This allows plugins to remain intact for next build.
 settings:
+  cleanPath: ['lib/*.js']
   srcPath: 'src'
   libPath: 'lib'
   mocha:
@@ -94,29 +95,60 @@ build:
 # Sometimes you rely on other tasks, so that is the way you call them.
 # Here mocha-test is a rule created by the 'mocha' plugin
 test:
-  - task: build
+  - task: install
   - task: mocha-test
-# You see below a quite complete list of what you can actually achieve with UBS.
-# Stay tuned !
+# Splitted install and install_plugins because building UBS requires these plugins
+# to be installed first hand. This build.yml needs them in their expected places.
 install:
+  - task: install_plugins
   - task: build
+install_plugins:
   - echo Moving plugins to lib/plugins folder
-  - mkdir %libPath/plugins
-  - cp %srcPath/plugins/* %libPath/plugins/
+  - mkdir -p %libPath/plugins
+  - cp -f %srcPath/plugins/* %libPath/plugins/
   - echo Installation complete, you can 'cd %libPath'
 ```
 
-As you can see, each sequence is either a command to execute, this is the default
-behavior, or a task. Except shell commands which are executed with [shelljs](https://github.com/arturadib/shelljs),
+Each sequence can either be a command to execute, this is the default, or
+a task. Except shell commands which are executed with [shelljs](https://github.com/arturadib/shelljs),
 all commands are currently run with ```sh -c```
+
+You can also use one of the following builtin actions:
+
+```yaml
+- log: notice level %version
+- log:
+  debug: debug level
+```
+
+```yaml
+- echo $WTF
+- env: WTF=still works!
+- echo $WTF
+```
+
+And if you want to retrieve a file from elsewhere (using [request](https://github.com/request/request)).
+
+```yaml
+init:
+  plugins:
+    - "grab"
+settings:
+  fileUrl: https://github.com/oorabona/ubs/archive/master.zip
+  grabTmpDir: test
+test:
+  - echo Retrieving %fileUrl
+  - grab: "%fileUrl"
+```
+
+> Note: For the above example, and the above example only, you need to include __grab__ plugin.
 
 ### Notes:
 
 Everything in the ```build.yml``` is holy, so plugins will never alter your
 settings. They can and will, however, complete with all the missing fields.
 
-It also means that if a rule already exists in your ```build.yml``` file, then
-it will be left untouched and executed as it is defined. As an example:
+It also means that if a rule already exists in your ```build.yml``` file, it will be left untouched and executed as it is defined.
 
 ```yaml
 init:
@@ -126,8 +158,8 @@ clean:
   - echo FUBAR!
 ```
 
-This will avoid plugins' ```clean``` target to be merged and you will only see
-a holy _FUBAR!_ message.
+In the above example, overriding 'clean' target will short circuit plugins' ```clean``` target, and therefore you will only see
+the holy _FUBAR!_ message. :smile:
 
 ## Plugins
 
@@ -156,7 +188,7 @@ distclean:
 ```
 
 And this is a quick'n'nice handling of simple ```clean``` and ```distclean``` tasks.
-See also the default settings for each one and the order they will be run.
+You can also set default values for each one and the order each task will be run.
 
 ### CoffeeScript example
 
@@ -185,8 +217,8 @@ After parsing, ```settings``` and ```rules``` will be evaluated  as a function
 or as a Plain Old Object.
 
 > ```rules``` will be evaluated right after merging settings so if your plugin
-relies on some configuration option another plugin defines, then make sure you
-ordered plugin loading correctly !
+relies on some configuration option another plugin defines, you have to make sure you
+ordered plugins loading correctly !
 
 The plugin architecture accepts both ```String``` and ```Object``` in return for
 both ```settings``` and ```rules```.
@@ -207,12 +239,37 @@ packagejson = JSON.parse fs.readFileSync 'package.json'
   licenses: packagejson.licenses
 ```
 
-This example shows how you can access pretty much anything if you want to
+As you can see, you can do pretty much anything you want to
 customize your own build with external tools and libraries.
+
+### Using actions
+
+Introduced with 0.3.0, you can now define ```actions```.
+Actions are set like ```settings``` or ```rules``` but have slight differences.
+
+An example to start with:
+```coffee
+@actions = (logging, config) ->
+  grab: (command, settings) ->
+    # Do stuff (see src/plugins/ubs-grab.coffee)
+```
+
+So basically when plugin is loaded, if ```actions``` exists, it must be a function. This function will be called by the plugin manager with two parameters:
+- logging: internal __logging__ instance
+- config: internal __config__ instance
+
+With these two you can co-operate with __UBS__ internals without much hassle.
+
+You may have more than one ```action``` defined by a plugin but you cannot redefine
+an existing action.
+
+> ```actions``` function must return an object. That object will extend existing [Dispatch](https://github.com/oorabona/ubs/tree/master/src/dispatch.coffee) object.
+
+> Actions will be run within the __Dispatch__ context and must comply with the existing [Q Promises](https://github.com/kriskowal/q). So each defined action must return a promise and that promise must be either ```resolved``` or ```rejected```.
 
 ## Bugs
 
-Don't see any at the moment :smile: !
+Don't see any at the moment :wink: !
 
 Feel free to open a new issue if you find any. Suggestions and PR are always welcome !
 
