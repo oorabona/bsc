@@ -30,6 +30,11 @@ describe 'Bootstrap tests', ->
       expect(p.stderr.toString()).to.be("ERROR: error level\n")
       expect(p.stdout.toString()).to.match /Hello World!/
 
+  it 'should be able to get and set environment variables', future ->
+    exec("#{binubs} -b test/test_env.yml test", env: WTF: "works!").then (p) ->
+      expect(p.stdout.toString()).to.match /works!/
+      expect(p.stdout.toString()).to.match /still works!/
+
 describe 'Plugins', ->
   describe 'Package JSON', ->
     it 'should be able to output version from packagejson', future ->

@@ -1,0 +1,5 @@
+test:
+  - env
+  - echo $WTF
+  - env: WTF=still works!
+  - echo $WTF
