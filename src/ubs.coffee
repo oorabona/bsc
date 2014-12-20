@@ -131,13 +131,13 @@ run = (options) ->
         step = pipeline.shift()
         break unless step
         if 'string' is Utils.toType step
-          runList.push type: 'exec', cmd: step
+          runList.push action: 'exec', cmd: step
         else if step.exec
-          runList.push type: 'exec', cmd: step.exec
+          runList.push action: 'exec', cmd: step.exec
         else if step.env
-          runList.push type: 'env', cmd: step.env
+          runList.push action: 'env', cmd: step.env
         else if step.log
-          runList.push type: 'log', cmd: step.log
+          runList.push action: 'log', cmd: step.log
         else if step.task
           pipeline = tasks[step.task].concat pipeline
           logging.debug "New dependant task #{step.task}"
@@ -145,12 +145,13 @@ run = (options) ->
           throw new Error "Action unrecognized: #{util.inspect step}"
 
     logging.debug "Sequence loaded: #{util.inspect runList}"
+    logging.debug "Settings: #{util.inspect tasks.settings}"
 
     results = []
     next = (runList) ->
       item = runList.shift()
       return unless item
-      Dispatch["run_#{item.type}"](item.cmd, tasks.settings).then (result) ->
+      Dispatch["run_#{item.action}"](item.cmd, tasks.settings).then (result) ->
         results.push result
         next runList
       , (error) ->
@@ -158,7 +159,7 @@ run = (options) ->
     next runList
 
 parseOptions = (argv, slice) ->
-  options = nopt(longOptions, shortOptions, argv, slice)
+  options = nopt longOptions, shortOptions, argv, slice
   if options.colors then Config.useColors true
   if options["no-colors"] then Config.useColors false
   if options.verbose then Config.setVerbose true
