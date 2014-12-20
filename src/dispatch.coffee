@@ -37,8 +37,12 @@ Dispatch =
     # If first argument is one of the ShellCommands list, use shelljs instead.
     argv = command.split(' ')
     if ShellCommands.indexOf(argv[0]) isnt -1
-      shellCode = shell[argv[0]].apply @, argv[1...]
-      logging.debug "shell command '#{command}' returned '#{shellCode}'"
+      shellCmd = shell[argv[0]]
+      if typeof shellCmd is 'function'
+        shellCode = shell[argv[0]].apply @, argv[1...]
+      else
+        shellCode = shellCmd
+      logging.debug "shell command '#{command}' returned '#{JSON.stringify shellCode, undefined, 4}'"
       # check return value
       if err = shell.error()?[...-1]
         deferred.reject "Command '#{command}' returned '#{err}'"
