@@ -12,6 +12,8 @@ require 'coffee-script/register'
 
 logging = require "./logging"
 {toType, recursiveMerge} = require './utils'
+Dispatch = require "./dispatch"
+{Config} = require './config'
 
 plugins = {}
 pluginPaths = []
@@ -91,7 +93,7 @@ Plugins =
         return Q context
 
     Q.Promise (resolve, reject, notify) ->
-      fs.readFile foundPlugin, "utf-8", (error, code) ->
+      fs.readFile foundPlugin, "utf8", (error, code) ->
         reject(new Error error) if error
 
         try
@@ -110,6 +112,8 @@ Plugins =
               # No ext => let's try to 'require' it (might be an installed module)
               throw new Error "Could not load #{pluginName}: #{foundPlugin} not found!"
 
+          if pContext.actions
+            Dispatch.extend pContext.actions logging, Config
           if pContext.settings
             settings = if typeof pContext.settings is 'function'
               pContext.settings()

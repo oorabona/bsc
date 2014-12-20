@@ -14,7 +14,15 @@ ShellCommands = [
 ]
 
 Dispatch =
-  run_exec: (command, settings) ->
+  extend: (actions) ->
+    knownActions = Object.keys @
+
+    for action of actions
+      if knownActions.indexOf(action) isnt -1
+        throw new Error "Action #{action} is already defined!"
+      @[action] = actions[action]
+      
+  exec: (command, settings) ->
     logging.info "+ #{command}"
     matches = command.match Config.REPLACE_SETTING_RE
 
@@ -73,7 +81,7 @@ Dispatch =
       promise.process = p
     promise
 
-  run_env: (command, settings) ->
+  env: (command, settings) ->
     logging.info "+ #{command}"
     envSettings = settings.exec or {}
     envSettings.env ?= process.env
@@ -94,7 +102,7 @@ Dispatch =
   #   - log: "This is a 'notice' message version %version"
   #   - log: warn: "This is a warning !"
   #   - log: debug: "This will be shown in debug mode only."
-  run_log: (command, settings) ->
+  log: (command, settings) ->
     if "string" is Utils.toType command
       level = "notice"
       output = command

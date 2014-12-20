@@ -121,6 +121,9 @@ run = (options) ->
 
     logging.debug "Looking for targets: #{options.tasklist}"
 
+    # Get all dispatch patterns
+    actionList = Object.keys Dispatch
+
     tasks = context[0]
     runList = []
     for task in options.tasklist then do (task) ->
@@ -132,17 +135,17 @@ run = (options) ->
         break unless step
         if 'string' is Utils.toType step
           runList.push action: 'exec', cmd: step
-        else if step.exec
-          runList.push action: 'exec', cmd: step.exec
-        else if step.env
-          runList.push action: 'env', cmd: step.env
-        else if step.log
-          runList.push action: 'log', cmd: step.log
         else if step.task
           pipeline = tasks[step.task].concat pipeline
           logging.debug "New dependant task #{step.task}"
         else
-          throw new Error "Action unrecognized: #{util.inspect step}"
+          foundAction = false
+          for actionType in actionList
+            if step[actionType]
+              runList.push action: actionType, cmd: step[actionType]
+              foundAction = true
+          unless foundAction
+            throw new Error "Action unrecognized: #{util.inspect step}"
 
     logging.debug "Sequence loaded: #{util.inspect runList}"
     logging.debug "Settings: #{util.inspect tasks.settings}"
@@ -151,7 +154,7 @@ run = (options) ->
     next = (runList) ->
       item = runList.shift()
       return unless item
-      Dispatch["run_#{item.action}"](item.cmd, tasks.settings).then (result) ->
+      Dispatch[item.action](item.cmd, tasks.settings).then (result) ->
         results.push result
         next runList
       , (error) ->
