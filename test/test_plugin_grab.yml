@@ -1,0 +1,9 @@
+init:
+  plugins:
+    - "grab"
+settings:
+  fileUrl: https://github.com/oorabona/ubs/archive/master.zip
+  grabTmpDir: test
+test:
+  - echo Retrieving %fileUrl
+  - grab: "%fileUrl"

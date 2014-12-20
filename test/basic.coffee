@@ -6,6 +6,7 @@ expect = require 'expect.js'
 mocha_sprinkles = require 'mocha-sprinkles'
 
 Q = require 'q'
+fs = require 'fs'
 
 exec = mocha_sprinkles.exec
 future = mocha_sprinkles.future
@@ -40,3 +41,9 @@ describe 'Plugins', ->
     it 'should be able to output version from packagejson', future ->
       exec("#{binubs} -b test/test_plugin_packagejson.yml test").then (p) ->
         expect(p.stdout.toString()).to.match /version [0-9]+\.[0-9]+/
+
+  describe 'Grab', ->
+    it 'should be able to retrieve this package\'s master zip file', future ->
+      exec("#{binubs} -b test/test_plugin_grab.yml test").then (p) ->
+        expect(p.stdout.toString()).to.match /Retrieving/
+        expect(fs.existsSync 'test/master.zip').to.be.ok()
