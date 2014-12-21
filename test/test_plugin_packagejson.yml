@@ -3,3 +3,4 @@ init:
     - "packagejson"
 test:
   - echo Build version %version
+  - echo Done.

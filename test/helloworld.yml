@@ -11,4 +11,7 @@ test:
       warning: warning level
   - log:
       error: error level
+  - echo Done.
+  # Nothing should run after an empty line like this
   -
+  - echo Bam!

@@ -6,3 +6,4 @@ test:
   - env: BBQ=bbq $WTF
   - echo $BBQ
   - env
+  - echo Done.

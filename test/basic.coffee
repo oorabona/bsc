@@ -30,19 +30,24 @@ describe 'Bootstrap tests', ->
     exec("#{binubs} -b test/helloworld.yml test").then (p) ->
       expect(p.stderr.toString()).to.be("ERROR: error level\n")
       expect(p.stdout.toString()).to.match /Hello World!/
+      expect(p.stdout.toString()).to.match /Done\./
+      expect(p.stdout.toString()).to.not.match /Bam!/
 
   it 'should be able to get and set environment variables', future ->
     exec("#{binubs} -b test/test_env.yml test", env: WTF: "works!").then (p) ->
       expect(p.stdout.toString()).to.match /bbq still works!/
+      expect(p.stdout.toString()).to.match /Done\./
 
 describe 'Plugins', ->
   describe 'Package JSON', ->
     it 'should be able to output version from packagejson', future ->
       exec("#{binubs} -b test/test_plugin_packagejson.yml test").then (p) ->
         expect(p.stdout.toString()).to.match /version [0-9]+\.[0-9]+/
+        expect(p.stdout.toString()).to.match /Done\./
 
   describe 'Grab', ->
     it 'should be able to retrieve this package\'s master zip file', future ->
       exec("#{binubs} -b test/test_plugin_grab.yml test").then (p) ->
         expect(p.stdout.toString()).to.match /Retrieving/
+        expect(p.stdout.toString()).to.match /Done\./
         expect(fs.existsSync 'test/master.zip').to.be.ok()

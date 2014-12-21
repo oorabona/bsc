@@ -7,3 +7,4 @@ settings:
 test:
   - echo Retrieving %fileUrl
   - grab: "%fileUrl"
+  - echo Done.
