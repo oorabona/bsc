@@ -58,7 +58,7 @@ main = ->
       logging.notice "Build complete: #{result.join '\n'}"
     process.exit result
   , (error) ->
-    logging.error error.message
+    logging.error util.inspect error
     if options.debug
       logging.info error.stack
     process.exit 1
