@@ -38,6 +38,10 @@ describe 'Bootstrap tests', ->
       expect(p.stdout.toString()).to.match /bbq still works!/
       expect(p.stdout.toString()).to.match /Done\./
 
+  it 'should be able to run nested instance and back propagate status', future ->
+    exec("#{binubs} -b test/test_env.yml test", env: WTF: "works!").then (p) ->
+      expect(p.stdout.toString()).to.match /test works!/
+
 describe 'Plugins', ->
   describe 'Package JSON', ->
     it 'should be able to output version from packagejson', future ->

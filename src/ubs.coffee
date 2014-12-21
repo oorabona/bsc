@@ -55,8 +55,8 @@ main = ->
       result.forEach (task) ->
         logging.notice "- #{task}" if task isnt 'settings'
     else
-      logging.notice "Build complete: #{result.join '\n'}"
-    process.exit result
+      process.send result
+    process.exit 0
   , (error) ->
     logging.error util.inspect error
     if options.debug
@@ -79,7 +79,7 @@ run = (options) ->
     buildFile = options.build
 
     Q.Promise (resolve, reject, notify) ->
-      fs.readFile buildFile, "utf-8", (error, code = {}) ->
+      fs.readFile buildFile, "utf8", (error, code = {}) ->
         reject(new Error error) if error
 
         resolve yaml.safeLoad code, yaml.JSON_SCHEMA
@@ -126,6 +126,10 @@ run = (options) ->
 
     tasks = context[0]
     runList = []
+
+    # This needs to be initialized for environment / cwd updates
+    tasks.settings.exec = {}
+
     for task in options.tasklist then do (task) ->
       pipeline = tasks[task]
       unless pipeline
@@ -153,7 +157,11 @@ run = (options) ->
     results = []
     next = (runList) ->
       item = runList.shift()
-      return unless item
+      unless item
+        return {
+          tasks: tasks
+          results: results
+        }
       Dispatch[item.action](item.cmd, tasks.settings).then (result) ->
         results.push result
         next runList

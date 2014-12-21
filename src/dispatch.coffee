@@ -26,7 +26,7 @@ Dispatch =
   ###
   EXEC:
   ###
-  exec: (command, settings) ->
+  exec: (command, settings, pStdout = true) ->
     logging.info "+ #{command}"
     matches = command.match Config.REPLACE_SETTING_RE
 
@@ -47,7 +47,7 @@ Dispatch =
     promise = deferred.promise
 
     # If first argument is one of the ShellCommands list, use shelljs instead.
-    argv = command.split(' ')
+    argv = command.split ' '
     if ShellCommands.indexOf(argv[0]) isnt -1
       shellCmd = shell[argv[0]]
       if typeof shellCmd is 'function'
@@ -63,9 +63,15 @@ Dispatch =
       execSettings = _.clone settings.exec or {}
       execSettings.env ?= process.env
       execSettings.cwd ?= process.cwd()
-      execSettings.stdio = "pipe"
 
-      stdout = stderr = ""
+      # We do not (yet?) handle stdin, we want to monitor stdout, to simply
+      # output stderr and to receive messages from the children thru an ipc channel.
+      # At the moment it is activated everytime. It might be an issue with some
+      # commands, which would lead to a complete crash.
+      # We'll see when that happens :)
+      execSettings.stdio = [null, "pipe", process.stderr, "ipc"]
+
+      stdout = ""
 
       # FIXME: will need to work on portability
       command = [ "/bin/sh", "-c", command ]
@@ -76,21 +82,21 @@ Dispatch =
       p.on 'error', (error) ->
         deferred.reject new Error "Child error: #{util.inspect error}"
 
-      p.stderr.on 'data', (chunk) ->
-        stderr += chunk
-
       # live stream output
       p.stdout.on 'data', (chunk) ->
         stdout += chunk
-        process.stdout.write chunk
+        if pStdout
+          process.stdout.write chunk
 
       p.on 'close', (code, signal) ->
-        if stderr.length > 0
-          logging.error "Child process returned data on stderr:\n#{stderr}"
-
         logging.debug "spawn #{p.pid} finished"
 
+        # Remove last character (\n)
         deferred.resolve stdout?[...-1]
+
+      # IPC channel back propagates environment to parent
+      p.on 'message', (message) ->
+        settings.exec.env = message.tasks.settings.exec.env
 
       promise.process = p
     promise
@@ -99,13 +105,13 @@ Dispatch =
     logging.info "+ #{command}"
 
     # We will propagate changes upstream to build global environment
-    envSettings = settings.exec or {}
+    envSettings = settings.exec ? {}
     envSettings.env ?= process.env
 
     # Evaluate right hand side using shell command "echo"
     # m[1] contains key   m[2] contains value
     if m = command.match Config.SETTING_RE
-      @exec("echo #{m[2]}", settings).then (result) ->
+      @exec("echo #{m[2]}", settings, false).then (result) ->
         return envSettings.env[m[1]] = result
     else
       throw new Error "Invalid environment setting: #{command}"

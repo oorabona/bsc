@@ -1,0 +1,5 @@
+test:
+  - $_ -b test/test_ipc_child.yml -D test2
+  - echo "test $TEST"
+test2:
+  - env: TEST="works!"
