@@ -1,8 +1,7 @@
 ###
 UBS plugin 'grab'
 -----------------
-
-Purpose: add a handler to HTTP get a file
+Purpose: to grab a file from somewhere remote
 ###
 
 request = require 'request'
@@ -37,15 +36,18 @@ Q = require 'q'
 
     logging.info "+ Grab #{command} (destination: #{resolvedPath})"
 
-    # Make a new promise
+    # Init a new promise, promise me a responseCode sometime
     deferred = Q.defer()
     promise = deferred.promise
+    responseCode = null
 
     request command
     .pipe fs.createWriteStream path.join resolvedPath, path.basename command
     .on 'error', (error) ->
       deferred.reject error
     .on 'end', (response) ->
-      deferred.resolve response.status
+      responseCode = response.status
+    .on 'finish', ->
+      deferred.resolve responseCode
 
     promise
