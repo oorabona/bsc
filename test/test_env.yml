@@ -3,3 +3,6 @@ test:
   - echo $WTF
   - env: WTF=still works!
   - echo $WTF
+  - env: BBQ=bbq $WTF
+  - echo $BBQ
+  - env

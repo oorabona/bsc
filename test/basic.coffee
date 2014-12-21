@@ -33,8 +33,7 @@ describe 'Bootstrap tests', ->
 
   it 'should be able to get and set environment variables', future ->
     exec("#{binubs} -b test/test_env.yml test", env: WTF: "works!").then (p) ->
-      expect(p.stdout.toString()).to.match /works!/
-      expect(p.stdout.toString()).to.match /still works!/
+      expect(p.stdout.toString()).to.match /bbq still works!/
 
 describe 'Plugins', ->
   describe 'Package JSON', ->
