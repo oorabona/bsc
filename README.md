@@ -7,6 +7,33 @@ This package is another Javascript builder like [Grunt](http://gruntjs.com), [Ca
 
 Hence the _Unified_.
 
+## What's new in 0.4.0 ?
+
+Sometimes you need to conditionally call a part of your script. Many solutions
+exist but by spawning ourselves, conditions are shell scripted. This allows quick
+and easy environment variables checks and clear separation between actions and
+conditions.
+
+That would be a typical use case:
+
+```yaml
+settings:
+  exec:
+    env:
+      TEST: "bad"
+test:
+  - echo Test is $TEST
+  # If you want to conditionally call another build you may have
+  # to enclose within quotes..
+  - '[ "$TEST" = "bad" ] && $_ -b path/to/build.yml test2'
+  # The spawned process can also back propagate environment variables
+  - echo Expecting test to be $TEST
+test2:
+  - env: TEST="working!"
+```
+
+First line is plain shell scripting and syntax may vary. If and only if ```TEST``` is equal to ```bad``` shall we change to ```working```. And we do that by spawning ourselves. Most shells set ```$_``` to the running process executable name but if not the case,  you may just replace by _ubs_.
+
 ## How it works
 
 You need a ```build.yml``` in your __current working directory__ and that's it.
