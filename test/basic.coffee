@@ -41,7 +41,7 @@ describe 'Bootstrap tests', ->
   # Mimic real shell call by setting _ to ubs process path
   it 'should be able to run nested instance and back propagate status', future ->
     exec("#{binubs} -b test/test_ipc_child.yml test", env: _: binubs).then (p) ->
-      expect(p.stdout.toString()).to.match /test works!/
+      expect(p.stdout.toString()).to.match /Expecting test to be working!/
 
 describe 'Plugins', ->
   describe 'Package JSON', ->

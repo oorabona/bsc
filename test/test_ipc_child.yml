@@ -1,5 +1,12 @@
+settings:
+  exec:
+    env:
+      TEST: "bad"
 test:
-  - $_ -b test/test_ipc_child.yml -D test2
-  - echo "test $TEST"
+  - echo Test is $TEST
+  # So if you want to conditionally call another build
+  - '[ "$TEST" = "bad" ] && $_ -b test/test_ipc_child.yml -D test2'
+  # And the spawned process can also back propagate environment variables
+  - echo Expecting test to be $TEST
 test2:
-  - env: TEST="works!"
+  - env: TEST="working!"
