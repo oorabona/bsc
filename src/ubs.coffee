@@ -128,7 +128,14 @@ run = (options) ->
     runList = []
 
     # This needs to be initialized for environment / cwd updates
-    tasks.settings.exec = {}
+    tasks.settings.exec ?= {}
+    userEnv = tasks.settings.exec.env
+    tasks.settings.exec.env = process.env
+
+    # If user set environment variables, merge them into process.env
+    if userEnv
+      for key, value of userEnv
+        tasks.settings.exec.env[key] = value
 
     for task in options.tasklist then do (task) ->
       pipeline = tasks[task]
