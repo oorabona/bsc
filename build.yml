@@ -1,13 +1,13 @@
-# The init part, checked first and looks for plugins to load (in order, but order
+# The init part is run first. It looks for plugins to load (in order, but order
 # in this example does not really matter).
 init:
   plugins:
     - mocha
     - packagejson
     - clean
-# It is the place to set environment variables. Plugins can add extra key=value
-# settings, as for Mocha where 'bin' and 'useCoffe'. Mocha options are modified
-# by useCoffee then propagated when called.
+# It is the place to set plugins variables. Plugins can add extra key=value
+# settings, as for Mocha where 'bin' and 'useCoffee'. Mocha options are modified
+# accordingly. The special 'env' can be overridden to add new environment variables.
 # We tell 'clean' package to not remove 'lib' globally but only the core build.
 # This allows plugins to remain intact for next build.
 settings:
@@ -19,9 +19,8 @@ settings:
     useCoffee: true
 prebuild:
   - npm update
-# Note that you can call shell commands
-# %name and %version are variables from settings above. They are string replaced
-# before running command.
+# You can call shell commands as well. In the build task, %name and %version are
+# variables from settings above. They are replaced in place before running command.
 build:
   - echo Building %name version %version ...
   - coffee -o %libPath -c %srcPath/*.coffee
