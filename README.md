@@ -3,12 +3,9 @@
 > 'Write as little code as you can'
 -- Yoda
 
-This package is meant to avoid all the extra coding you would need to do whether you use [Grunt](http://gruntjs.com), [Cake](http://www.coffeescript.org) or [Gulp](http://gulpjs.com).
+This package is another Javascript builder like [Grunt](http://gruntjs.com), [Cake](http://www.coffeescript.org) or [Gulp](http://gulpjs.com) but with YAML like [Travis CI](http://travis-ci.org) ```.travis.yml``` containing (enhanced) single line ```Makefile```-like instructions.
 
-A very different design pattern is used in @robey [plz](https://github.com/robey/plz).
-It gave a lot of ideas you can find in this code and was a great code base !
-
-So why _Unified_ ? Well, it has been designed from other projects pros and cons. Unified also by the choice of YAML from [Travis CI](http://travis-ci.org) ```.travis.yml``` and an old experience of ```Makefile```!
+Hence the _Unified_.
 
 ## How it works
 
@@ -22,14 +19,14 @@ By default, __ubs__ will look for a target named 'install'.
 But you can select your targets:
 
 ```shell
-$ ubs clean install
+$ ubs clean test
 ```
 
 Targets will be run in sequence and depending tasks will be automatically added.
 
 ```shell
 $ ubs --help
-ubs 0.3.0
+ubs 0.4.0
 usage: ubs [options] [task-setting]* [task-name]*
 general options are listed below. task-settings are all of the form
 "<name>=<value>".
@@ -65,16 +62,16 @@ The build file is all [YAML](http://yaml.org) and follows a pattern close to
 Makefile.
 
 ```yaml
-# The init part, checked first and looks for plugins to load (in order, but order
+# The init part is run first. It looks for plugins to load (in order, but order
 # in this example does not really matter).
 init:
   plugins:
     - mocha
     - packagejson
     - clean
-# It is the place to set environment variables. Plugins can add extra key=value
-# settings, as for Mocha where 'bin' and 'useCoffe'. Mocha options are modified
-# by useCoffee then propagated when called.
+# It is the place to set plugins variables. Plugins can add extra key=value
+# settings, as for Mocha where 'bin' and 'useCoffee'. Mocha options are modified
+# accordingly. The special 'env' can be overridden to add new environment variables.
 # We tell 'clean' package to not remove 'lib' globally but only the core build.
 # This allows plugins to remain intact for next build.
 settings:
@@ -86,9 +83,8 @@ settings:
     useCoffee: true
 prebuild:
   - npm update
-# Note that you can call shell commands
-# %name and %version are variables from settings above. They are string replaced
-# before running command.
+# You can call shell commands as well. In the build task, %name and %version are
+# variables from settings above. They are replaced in place before running command.
 build:
   - echo Building %name version %version ...
   - coffee -o %libPath -c %srcPath/*.coffee

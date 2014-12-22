@@ -61,7 +61,6 @@ Dispatch =
       deferred.resolve shellCode ? 'success'
     else
       execSettings = _.clone settings.exec or {}
-      execSettings.env ?= process.env
       execSettings.cwd ?= process.cwd()
 
       # We do not (yet?) handle stdin, we want to monitor stdout, to simply
@@ -80,7 +79,7 @@ Dispatch =
       logging.debug "spawn #{p.pid}: #{util.inspect(command)}"
 
       p.on 'error', (error) ->
-        deferred.reject new Error "Child error: #{util.inspect error}"
+        deferred.reject "Child error: #{util.inspect error}"
 
       # live stream output
       p.stdout.on 'data', (chunk) ->
@@ -96,6 +95,8 @@ Dispatch =
 
       # IPC channel back propagates environment to parent
       p.on 'message', (message) ->
+        unless message.tasks?.settings?.exec
+          logging.info "IPC message #{util.inspect message, undefined, 4} not understood"
         settings.exec.env = message.tasks.settings.exec.env
 
       promise.process = p
