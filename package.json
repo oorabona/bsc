@@ -4,7 +4,8 @@
   "description": "Unified Build System",
   "main": "./lib/ubs",
   "scripts": {
-    "test": "./bin/ubs test"
+    "test": "./bin/ubs test",
+    "prepublish": "./node_modules/.bin/coffee -b -c -o lib/ src/ && cp src/plugins/*.yaml lib/plugins/"
   },
   "repository": {
     "type": "git",
@@ -27,12 +28,7 @@
     "plugin"
   ],
   "author": "Olivier ORABONA",
-  "licenses": [
-    {
-      "type": "Apache License 2.0",
-      "url": "https://github.com/oorabona/ubs/blob/master/LICENSE"
-    }
-  ],
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/oorabona/ubs/issues"
   },
@@ -47,6 +43,7 @@
     "js-yaml": "^3.2.3",
     "nopt": "^3.0.1",
     "q": "^1.1.2",
+    "request": "^2.65.0",
     "sandbox-runner": "^0.1.1",
     "shelljs": "^0.3.0",
     "sprintf": "^0.1.5",
@@ -60,7 +57,7 @@
     "test"
   ],
   "bin": {
-    "ubs": "bin/ubs"
+    "ubs": "./bin/ubs"
   },
   "preferGlobal": "true",
   "engines": {
