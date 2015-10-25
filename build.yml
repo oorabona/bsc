@@ -8,22 +8,19 @@ init:
 # It is the place to set plugins variables. Plugins can add extra key=value
 # settings, as for Mocha where 'bin' and 'useCoffee'. Mocha options are modified
 # accordingly. The special 'env' can be overridden to add new environment variables.
-# We tell 'clean' package to not remove 'lib' globally but only the core build.
-# This allows plugins to remain intact for next build.
+# We tell 'clean' package to remove 'lib' globally. We need to rebuild all each time.
 settings:
-  toClean: ['lib/*.js']
+  toClean: ['lib/']
   srcPath: 'src'
   libPath: 'lib'
   mocha:
     bin: 'mocha'
     useCoffee: true
-prebuild:
-  - npm update
 # You can call shell commands as well. In the build task, %name and %version are
 # variables from settings above. They are replaced in place before running command.
 build:
   - echo Building %name version %version ...
-  - coffee -o %libPath -c %srcPath/*.coffee
+  - coffee -b -c -o %libPath %srcPath/
 # Sometimes you rely on other tasks, so that is the way you call them.
 # Here mocha-test is a rule created by the 'mocha' plugin
 test:
@@ -32,10 +29,10 @@ test:
 # Splitted install and install_plugins because building UBS requires these plugins
 # to be installed first hand. This build.yml needs them in their expected places.
 install:
-  - task: install_plugins
   - task: build
+  - task: install_plugins
 install_plugins:
-  - echo Moving plugins to lib/plugins folder
-  - mkdir -p %libPath/plugins
-  - cp -f %srcPath/plugins/* %libPath/plugins/
-  - echo Installation complete, you can 'cd %libPath'
+  - echo Copying YAML plugins to lib/plugins folder
+  - cp -f %srcPath/plugins/*.yaml %libPath/plugins/
+  - echo Copying JS plugins to lib/plugins folder
+  - cp -f %srcPath/plugins/*.js %libPath/plugins/
