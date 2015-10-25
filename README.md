@@ -32,7 +32,7 @@ test2:
   - env: TEST="working!"
 ```
 
-First line is plain shell scripting and syntax may vary. If and only if ```TEST``` is equal to ```bad``` shall we change to ```working```. And we do that by spawning ourselves. Most shells set ```$_``` to the running process executable name but if not the case,  you may just replace by _ubs_.
+First line is plain shell scripting and syntax may vary. If and only if ```TEST``` is equal to ```bad``` shall we change to ```working```. And we do that by spawning ourselves. Most shells set ```$_``` to the executable name you entered in the shell, but if not the case you may just replace by _ubs_.
 
 ## How it works
 

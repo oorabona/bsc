@@ -11,7 +11,7 @@ init:
 # We tell 'clean' package to not remove 'lib' globally but only the core build.
 # This allows plugins to remain intact for next build.
 settings:
-  cleanPath: ['lib/*.js']
+  toClean: ['lib/*.js']
   srcPath: 'src'
   libPath: 'lib'
   mocha:

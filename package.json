@@ -1,6 +1,6 @@
 {
   "name": "ubs",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "Unified Build System",
   "main": "./lib/ubs",
   "scripts": {
@@ -12,6 +12,8 @@
   },
   "keywords": [
     "build",
+    "javascript",
+    "unified",
     "system",
     "coffee",
     "server",
