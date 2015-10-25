@@ -41,13 +41,14 @@ Q = require 'q'
     promise = deferred.promise
     responseCode = null
 
-    request command
-    .pipe fs.createWriteStream path.join resolvedPath, path.basename command
-    .on 'error', (error) ->
-      deferred.reject error
-    .on 'end', (response) ->
-      responseCode = response.status
-    .on 'finish', ->
-      deferred.resolve responseCode
+    request
+      .get command
+      .pipe(fs.createWriteStream path.join resolvedPath, path.basename command)
+      .on 'error', (error) ->
+        deferred.reject error
+      .on 'end', (response) ->
+        responseCode = response.status
+      .on 'finish', ->
+        deferred.resolve responseCode
 
     promise
