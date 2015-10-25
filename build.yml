@@ -24,7 +24,7 @@ build:
 # Sometimes you rely on other tasks, so that is the way you call them.
 # Here mocha-test is a rule created by the 'mocha' plugin
 test:
-  - task: install
+  - echo Running test suites...
   - task: mocha-test
 # Splitted install and install_plugins because building UBS requires these plugins
 # to be installed first hand. This build.yml needs them in their expected places.
