@@ -194,7 +194,7 @@ parseTaskList = (options, settings={}) ->
       segments = m[1].split(".")
       obj = settings
       for segment in segments[0...-1]
-        obj = (obj[segment] or= {})
+        obj = (obj[segment] or {})
       obj[segments[segments.length - 1]] = m[2]
     else
       throw new Error("I don't know what to do with '#{word}'")

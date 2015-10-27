@@ -56,3 +56,7 @@ describe 'Plugins', ->
         expect(p.stdout.toString()).to.match /Retrieving/
         expect(p.stdout.toString()).to.match /Done\./
         expect(fs.existsSync 'test/master.zip').to.be.ok()
+
+  after ->
+    # We completed our task, remove created files
+    fs.unlinkSync "test/master.zip"

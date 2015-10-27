@@ -38,16 +38,18 @@ Q = require 'q'
 
     # Init a new promise, promise me a responseCode sometime
     deferred = Q.defer()
-    promise = deferred.promise
+    {promise} = deferred
     responseCode = null
 
     request
       .get command
-      .pipe(fs.createWriteStream path.join resolvedPath, path.basename command)
       .on 'error', (error) ->
         deferred.reject error
-      .on 'end', (response) ->
-        responseCode = response.status
+      .on 'response', (response) ->
+        logging.debug "Grab server response: #{util.inspect response}"
+        responseCode = response.statusCode
+        logging.info "+ Grab server response statusCode: #{responseCode}"
+      .pipe(fs.createWriteStream path.join resolvedPath, path.basename command)
       .on 'finish', ->
         deferred.resolve responseCode
 
