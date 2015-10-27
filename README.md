@@ -1,13 +1,20 @@
 # Unified Build System
 
+[![NPM Version](https://img.shields.io/npm/v/ubs.svg)](https://npmjs.org/package/ubs)
+[![NPM Downloads](https://img.shields.io/npm/dm/ubs.svg)](https://npmjs.org/package/ubs)
+[![Build Status](https://travis-ci.org/oorabona/ubs.png)](https://travis-ci.org/oorabona/ubs)
+[![Dependency Status](https://david-dm.org/oorabona/ubs.svg)](https://david-dm.org/oorabona/ubs)
+[![devDependency Status](https://david-dm.org/oorabona/ubs/dev-status.svg)](https://david-dm.org/oorabona/ubs#info=devDependencies)
+
 > 'Write as little code as you can'
--- Yoda
 
 This package is another Javascript builder like [Grunt](http://gruntjs.com), [Cake](http://www.coffeescript.org) or [Gulp](http://gulpjs.com) but with YAML like [Travis CI](http://travis-ci.org) ```.travis.yml``` containing (enhanced) single line ```Makefile```-like instructions.
 
+Also, it was intended to be as simple as possible to call from ```npm run``` so that you can map ```npm``` script names to ```ubs``` counterparts.
+
 Hence the _Unified_.
 
-## What's new in 0.4.0 ?
+## What's new in 0.4.1 ?
 
 Sometimes you need to conditionally call a part of your script. Many solutions
 exist but by spawning ourselves, conditions are shell scripted. This allows quick
