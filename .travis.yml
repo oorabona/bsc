@@ -5,9 +5,6 @@ node_js:
   - "0.12"
   - "4.2"
 sudo: false
-before_install:
-  # Install coffee globally
-  #- npm install -g coffee-script
 install:
   # Ensure source install works and compiles correctly
   - npm install
