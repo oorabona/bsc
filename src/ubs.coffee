@@ -68,23 +68,21 @@ main = ->
 
 run = (options) ->
   logging.debug "Command-line options #{util.inspect _.omit(options, "argv")}: tasks #{options.argv.remain}"
-  Q.fcall (resolve) ->
+  # Load build.yml or result of options.build
+  buildFile = options.build
+  Q.Promise (resolve, reject, notify) ->
+    fs.readFile buildFile, "utf8", (error, code = {}) ->
+      reject(new Error error) if error
+
+      resolve yaml.safeLoad code, yaml.JSON_SCHEMA
+  .then (tasks) ->
     tasklist = parseTaskList options
     if tasklist[0].length is 0
       options.tasklist = [ Config.DEFAULT_TASK ]
     else
       options.tasklist = tasklist[0]
 
-    # Load build.yml or result of options.build
-    buildFile = options.build
-
-    Q.Promise (resolve, reject, notify) ->
-      fs.readFile buildFile, "utf8", (error, code = {}) ->
-        reject(new Error error) if error
-
-        resolve yaml.safeLoad code, yaml.JSON_SCHEMA
-
-  .then (tasks) ->
+    Utils.extend tasks.settings, tasklist[1]
     logging.debug "Tasks #{util.inspect tasks, undefined, 4}"
 
     # That may happen, log for informational purposes only.
@@ -185,17 +183,19 @@ parseOptions = (argv, slice) ->
   options.build ?= process.env["UBS_BUILD"] ? Config.DEFAULT_BUILD_FILE
   options
 
-parseTaskList = (options, settings={}) ->
+parseTaskList = (options) ->
   tasklist = []
+  settings = {}
   for word in options.argv.remain
     if word.match Config.TASK_REGEX
       tasklist.push word
     else if (m = word.match Config.SETTING_RE)
       segments = m[1].split(".")
-      obj = settings
-      for segment in segments[0...-1]
-        obj = (obj[segment] or {})
-      obj[segments[segments.length - 1]] = m[2]
+      tmp = settings
+      for segment in segments[...-1]
+        tmp[segment] = {}
+        tmp = tmp[segment]
+      tmp[segments[segments.length - 1]] = m[2]
     else
       throw new Error("I don't know what to do with '#{word}'")
   options.tasklist = tasklist

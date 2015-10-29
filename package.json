@@ -1,6 +1,6 @@
 {
   "name": "ubs",
-  "version": "0.4.1",
+  "version": "0.4.2",
   "description": "Unified Build System",
   "main": "./lib/ubs",
   "scripts": {

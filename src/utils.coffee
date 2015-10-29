@@ -14,7 +14,20 @@ recursiveMerge = (obj1, obj2, force = true) ->
       obj1[k] = v
   return obj1
 
+# http://zurb.com/forrst/posts/Deep_Extend_an_Object_in_CoffeeScript-DWu
+deepExtend = (object, extenders...) ->
+  return {} if not object?
+  for other in extenders
+    for own key, val of other
+      if not object[key]? or typeof val isnt "object"
+        object[key] = val
+      else
+        object[key] = deepExtend object[key], val
+
+  object
+
 module.exports = exports = {
   toType: toType
   recursiveMerge: recursiveMerge
+  extend: deepExtend
 }
