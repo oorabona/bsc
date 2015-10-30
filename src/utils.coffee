@@ -47,7 +47,7 @@ resolve = (from, what) ->
   o
 
 omit = (obj, elements) ->
-  if typeof obj is 'undefined'
+  if typeof obj isnt 'object'
     throw new TypeError 'omit(Object, [elements to omit])'
 
   if typeof elements is 'string'

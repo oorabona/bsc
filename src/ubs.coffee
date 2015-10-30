@@ -6,13 +6,10 @@ fs = require 'fs'
 nopt = require 'nopt'
 path = require 'path'
 Q = require 'q'
-sprintf = require 'sprintf'
 util = require 'util'
-vm = require 'vm'
 yaml = require 'js-yaml'
 
 Utils = require './utils'
-
 logging = require "./logging"
 {Config} = require "./config"
 Dispatch = require "./dispatch"
