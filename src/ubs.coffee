@@ -104,7 +104,7 @@ run = (options) ->
       else if tasks.settings.pluginPath
         addPluginPath tasks.settings.pluginPath
 
-      logging.info "Plugins loading path: #{plugins.getPaths()}"
+      logging.info "Plugins loading path: #{plugins.getPaths().join ' then '}"
 
       # Plugin load is asynchronous
       Q.all tasks.init.plugins.map (plugin) ->

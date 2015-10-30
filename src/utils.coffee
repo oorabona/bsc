@@ -36,7 +36,7 @@ resolve = (from, what) ->
 
   o = from
   w = what.replace /\[(\w+)\]/g, '.$1'  # convert indexes to properties
-  w = w.replace /^\./, ''               # strip a leading dot
+  w = w.replace /^\./, ''               # strip the leading dot
   a = w.split '.'
   for k in a
     if typeof o[k] isnt 'undefined'
@@ -70,9 +70,9 @@ parseCommand = (command, settings, callback) ->
       # Remove leading and trailing '%'
       lookupSetting = settingToReplace[1...-1]
 
-      # Let the calling function by notified and update settingValue if needed.
-      settingValue = resolve settings, lookupSetting
-      settingValue = callback settingValue
+      # See what we have in our dictionary and let the calling function be notified.
+      # Callback can update settingValue if needed.
+      settingValue = callback resolve settings, lookupSetting
 
       if settingValue
         logging.debug "Found token to lookup #{lookupSetting}: #{settingValue}"

@@ -3,6 +3,7 @@
 * Shows help when called without arguments instead of throwing error about file not found
 * Removed unneeded dependencies
 * Refactored plugin parseCommand to be easier to use
+* Other minor fixes here and there
 
 0.5.0
 =====
