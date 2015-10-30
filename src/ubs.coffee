@@ -54,26 +54,33 @@ main = ->
     if options.debug
       logging.info error.stack
     process.exit 1
-  , (progress) ->
-    logging.info "Progress: #{progress}"
-    return
+  , (notice) ->
+    logging.notice notice
+    process.exit 0
 
 run = (options) ->
   logging.debug "Command-line options #{util.inspect Utils.omit(options, "argv")}: tasks #{options.argv.remain}"
+
+  # Parse task list from commandline and also grab settings that may have been set.
+  tasklist = parseTaskList options
+  if tasklist[0].length is 0
+    options.tasklist = [ Config.DEFAULT_TASK ]
+  else
+    options.tasklist = tasklist[0]
+
   # Load build.yml or result of options.build
   buildFile = options.build
   Q.Promise (resolve, reject, notify) ->
     fs.readFile buildFile, "utf8", (error, code = {}) ->
-      reject(new Error error) if error
+      # If something bad happened, like a ENOENT, it might be just the user asking for help.
+      if error
+        if tasklist[0][0] or buildFile isnt Config.DEFAULT_BUILD_FILE
+          reject new Error error
+        else
+          notify HELP
 
       resolve yaml.safeLoad code, yaml.JSON_SCHEMA
   .then (tasks) ->
-    tasklist = parseTaskList options
-    if tasklist[0].length is 0
-      options.tasklist = [ Config.DEFAULT_TASK ]
-    else
-      options.tasklist = tasklist[0]
-
     Utils.extend tasks.settings, tasklist[1]
     logging.debug "Tasks #{util.inspect tasks, undefined, 4}"
 
