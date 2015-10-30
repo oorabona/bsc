@@ -28,8 +28,7 @@ Dispatch =
   exec: (command, settings, pStdout = true) ->
     logging.info "+ #{command}"
 
-    command = Utils.parseCommand command, (lookupSetting) ->
-      settingValue = Utils.resolve settings, lookupSetting
+    command = Utils.parseCommand command, settings, (settingValue) ->
       if 'array' is Utils.toType settingValue
         settingValue.join ' '
       else settingValue

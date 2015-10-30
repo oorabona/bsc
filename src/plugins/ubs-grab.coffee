@@ -20,8 +20,7 @@ Q = require 'q'
     unless fs.existsSync resolvedPath
       throw new Error "Path #{settings.grabTmpDir} does not exist!"
 
-    command = helpers.parseCommand command, (lookupSetting) ->
-      helpers.resolve settings, lookupSetting
+    command = helpers.parseCommand command, settings
 
     logging.info "+ Grab #{command} (destination: #{resolvedPath})"
 

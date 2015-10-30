@@ -58,12 +58,12 @@ omit = (obj, elements) ->
   ret[k] = v if k not in e for k,v of obj
   ret
 
-parseCommand = (command, callback) ->
-  matches = command.match Config.REPLACE_SETTING_RE
-
-  # Automagically set default callback if none/falsy provided.
+parseCommand = (command, settings, callback) ->
+  # Automagically set identity callback if none/falsy provided.
   if typeof callback isnt 'function'
     callback = (v) -> v
+
+  matches = command.match Config.REPLACE_SETTING_RE
 
   if matches
     matches.forEach (settingToReplace) ->
@@ -71,7 +71,8 @@ parseCommand = (command, callback) ->
       lookupSetting = settingToReplace[1...-1]
 
       # Let the calling function by notified and update settingValue if needed.
-      settingValue = callback lookupSetting
+      settingValue = resolve settings, lookupSetting
+      settingValue = callback settingValue
 
       if settingValue
         logging.debug "Found token to lookup #{lookupSetting}: #{settingValue}"

@@ -2,6 +2,7 @@
 =====
 * Shows help when called without arguments instead of throwing error about file not found
 * Removed unneeded dependencies
+* Refactored plugin parseCommand to be easier to use
 
 0.5.0
 =====

@@ -337,7 +337,7 @@ Actions are set like ```settings``` or ```rules``` but have slight differences.
 An example to start with:
 
 ```coffee
-@actions = (logging, config) ->
+@actions = (logging, config, helpers) ->
   grab: (command, settings) ->
     # Do stuff (see src/plugins/ubs-grab.coffee)
 ```
@@ -350,6 +350,24 @@ When plugin is loaded, if ```actions``` exists, it must be a function. This func
 With these two you can co-operate with __UBS__ internals without hassle.
 
 You may have more than one ```action``` defined by a plugin but you cannot redefine an existing action (like ```exec``` for example).
+
+Each action take two parameters, the ```command``` is the full line from the build file, with ```%...%```, and the ```settings```.
+To process automatically these templates, you need to call from __inside__ your action:
+
+```coffee
+command = helpers.parseCommand command, settings
+```
+
+If you need special care about how you handle tokenization everytime it is parsed, e.g. variable can be an array, or some exotic type, then a callback is provided.
+
+```coffee
+command = helpers.parseCommand command, settings, (settingValue) ->
+  if 'array' is Utils.toType settingValue
+    settingValue.join ' '
+  else settingValue
+```
+
+This callback can also be used to ```throw Error``` if needed.
 
 > ```actions``` function must return an object. That object will extend existing [Dispatch](https://github.com/oorabona/ubs/tree/master/src/dispatch.coffee) object.
 
