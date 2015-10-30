@@ -1,3 +1,8 @@
+0.5.1
+=====
+* Shows help when called without arguments instead of throwing error about file not found
+* Removed unneeded dependencies
+
 0.5.0
 =====
 * New way for templating (string search/replace) in ```command```: %variable% (yeah the trailing '%')
