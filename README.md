@@ -301,10 +301,10 @@ Nice, isn't it ?
 @rules = (settings) ->
   if settings.mocha.useCoffee is on
     settings.mocha.options.push "--compilers coffee:coffee-script/register"
-    """
-    mocha-test:
-    - exec: #{settings.mocha.bin} -R #{settings.mocha.display} #{settings.mocha.options.join(' ')}
-    """
+  """
+  mocha-test:
+  - exec: #{settings.mocha.bin} -R #{settings.mocha.display} #{settings.mocha.options.join(' ')}
+  """
 ```
 
 When using ```Coffeescript``` or ```Javascript``` you will have more leverage on
