@@ -5,7 +5,6 @@ path = require 'path'
 util = require 'util'
 sandbox = require 'sandbox-runner'
 yaml = require 'js-yaml'
-_ = require 'underscore'
 
 # breaking change in coffee-script 1.7
 require 'coffee-script/register'
@@ -89,7 +88,7 @@ Plugins =
             rules = yaml.safeLoad rules, yaml.JSON_SCHEMA
 
           # Make sure settings is not overwritten by rules.
-          Utils.recursiveMerge context, _.omit(rules, 'settings'), false
+          Utils.recursiveMerge context, Utils.omit(rules, 'settings'), false
         return Q context
 
     Q.Promise (resolve, reject, notify) ->
@@ -128,7 +127,7 @@ Plugins =
               rules = yaml.safeLoad rules, yaml.JSON_SCHEMA
 
             # Make sure settings is not overwritten by rules.
-            Utils.recursiveMerge context, _.omit(rules, 'settings'), false
+            Utils.recursiveMerge context, Utils.omit(rules, 'settings'), false
 
           resolve context
         catch e

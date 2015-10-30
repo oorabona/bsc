@@ -1,9 +1,5 @@
 ###
-Unified Build System -- Yet another build system for Coffee/NodeJS
-
-Usage:
-$ ubs
-> shows possible tasks
+Unified Build System
 ###
 
 fs = require 'fs'
@@ -14,7 +10,6 @@ sprintf = require 'sprintf'
 util = require 'util'
 vm = require 'vm'
 yaml = require 'js-yaml'
-_ = require 'underscore'
 
 Utils = require './utils'
 
@@ -67,7 +62,7 @@ main = ->
     return
 
 run = (options) ->
-  logging.debug "Command-line options #{util.inspect _.omit(options, "argv")}: tasks #{options.argv.remain}"
+  logging.debug "Command-line options #{util.inspect Utils.omit(options, "argv")}: tasks #{options.argv.remain}"
   # Load build.yml or result of options.build
   buildFile = options.build
   Q.Promise (resolve, reject, notify) ->

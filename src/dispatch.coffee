@@ -2,7 +2,6 @@ child_process = require 'child_process'
 shell = require 'shelljs'
 Q = require 'q'
 util = require 'util'
-_ = require 'underscore'
 
 logging = require './logging'
 {Config} = require './config'

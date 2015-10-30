@@ -46,6 +46,18 @@ resolve = (from, what) ->
 
   o
 
+omit = (obj, elements) ->
+  if typeof obj is 'undefined'
+    throw new TypeError 'omit(Object, [elements to omit])'
+
+  if typeof elements is 'string'
+    e = [ elements ]
+  else e = elements
+
+  ret = {}
+  ret[k] = v if k not in e for k,v of obj
+  ret
+
 parseCommand = (command, callback) ->
   matches = command.match Config.REPLACE_SETTING_RE
 
@@ -76,4 +88,5 @@ module.exports = exports = {
   extend: deepExtend
   resolve: resolve
   parseCommand: parseCommand
+  omit: omit
 }
