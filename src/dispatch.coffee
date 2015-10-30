@@ -28,19 +28,14 @@ Dispatch =
   ###
   exec: (command, settings, pStdout = true) ->
     logging.info "+ #{command}"
-    matches = command.match Config.REPLACE_SETTING_RE
 
-    if matches
-      matches.forEach (settingToReplace) ->
-        # Remove leading '%'
-        lookupSetting = settingToReplace[1...]
-        unless settingValue = settings[lookupSetting]
-          throw new Error "Setting '#{lookupSetting}' not found for command '#{command}!'"
+    command = Utils.parseCommand command, (lookupSetting) ->
+      settingValue = Utils.resolve settings, lookupSetting
+      if 'array' is Utils.toType settingValue
+        settingValue.join ' '
+      else settingValue
 
-        if 'array' is Utils.toType settingValue
-          settingValue = settingValue.join ' '
-
-        command = command.replace settingToReplace, settingValue
+    logging.debug "Decoded: #{command}"
 
     # Make a new promise
     deferred = Q.defer()
@@ -60,8 +55,18 @@ Dispatch =
         deferred.reject "Command '#{command}' returned '#{err}'"
       deferred.resolve shellCode ? 'success'
     else
-      execSettings = _.clone settings.exec or {}
+      execSettings = env: settings.exec.env
       execSettings.cwd ?= process.cwd()
+
+      # Do that only first time called.
+      unless settings.exec.shellCmd
+        switch process.platform
+          when 'win32'
+            settings.exec.shellCmd = 'cmd.exe'
+            settings.exec.shellArgs = '/c'
+          else
+            settings.exec.shellCmd = '/bin/sh'
+            settings.exec.shellArgs = '-c'
 
       # We do not (yet?) handle stdin, we want to monitor stdout, to simply
       # output stderr and to receive messages from the children thru an ipc channel.
@@ -72,8 +77,7 @@ Dispatch =
 
       stdout = ""
 
-      # FIXME: will need to work on portability
-      command = [ "/bin/sh", "-c", command ]
+      command = [ settings.exec.shellCmd, settings.exec.shellArgs, command ]
 
       p = child_process.spawn command[0], command[1...], execSettings
       logging.debug "spawn #{p.pid}: #{util.inspect(command)}"

@@ -167,6 +167,7 @@ run = (options) ->
           tasks: tasks
           results: results
         }
+
       Dispatch[item.action](item.cmd, tasks.settings).then (result) ->
         results.push result
         next runList

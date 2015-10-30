@@ -38,9 +38,12 @@ describe 'Bootstrap tests', ->
       expect(p.stdout.toString()).to.match /bbq still works!/
       expect(p.stdout.toString()).to.match /Done\./
 
-  # Mimic real shell call by setting _ to ubs process path
+  # Call another instance of ourselves from build script to ensure we correctly
+  # propagate environment variables both ways (parent -> child and child->parent).
+  # We also override settings from command line to specify ubs instead of setting
+  # "_" environment variable which might not be possible under some testing environments.
   it 'should be able to run nested instance and back propagate status', future ->
-    exec("#{binubs} -b test/test_ipc_child.yml test", env: _: binubs).then (p) ->
+    exec("#{binubs} -b test/test_ipc_child.yml test bin=#{binubs}").then (p) ->
       expect(p.stdout.toString()).to.match /Expecting test to be working!/
 
 describe 'Plugins', ->

@@ -11,7 +11,7 @@ _ = require 'underscore'
 require 'coffee-script/register'
 
 logging = require "./logging"
-{toType, recursiveMerge} = require './utils'
+Utils = require './utils'
 Dispatch = require "./dispatch"
 {Config} = require './config'
 
@@ -79,17 +79,17 @@ Plugins =
           settings = if typeof pContext.settings is 'function'
             pContext.settings()
           else pContext.settings or {}
-          recursiveMerge context.settings, settings, false
+          Utils.recursiveMerge context.settings, settings, false
         if pContext.rules
           rules = if typeof pContext.rules is 'function'
             pContext.rules context.settings
           else pContext.rules or {}
 
-          if 'string' is toType rules
+          if 'string' is Utils.toType rules
             rules = yaml.safeLoad rules, yaml.JSON_SCHEMA
 
           # Make sure settings is not overwritten by rules.
-          recursiveMerge context, _.omit(rules, 'settings'), false
+          Utils.recursiveMerge context, _.omit(rules, 'settings'), false
         return Q context
 
     Q.Promise (resolve, reject, notify) ->
@@ -107,28 +107,28 @@ Plugins =
             when 'yaml'
               logging.debug "Loading YAML file #{foundPlugin}"
               pluginCtx = yaml.safeLoad code, yaml.JSON_SCHEMA
-              resolve recursiveMerge context, pluginCtx
+              resolve Utils.recursiveMerge context, pluginCtx
             else
               # No ext => let's try to 'require' it (might be an installed module)
               throw new Error "Could not load #{pluginName}: #{foundPlugin} not found!"
 
           if pContext.actions
-            Dispatch.extend pContext.actions logging, Config
+            Dispatch.extend pContext.actions logging, Config, Utils
           if pContext.settings
             settings = if typeof pContext.settings is 'function'
-              pContext.settings()
+              pContext.settings context.settings
             else pContext.settings or {}
-            recursiveMerge context.settings, settings, false
+            Utils.recursiveMerge context.settings, settings, false
           if pContext.rules
             rules = if typeof pContext.rules is 'function'
               pContext.rules context.settings
             else pContext.rules or {}
 
-            if 'string' is toType rules
+            if 'string' is Utils.toType rules
               rules = yaml.safeLoad rules, yaml.JSON_SCHEMA
 
             # Make sure settings is not overwritten by rules.
-            recursiveMerge context, _.omit(rules, 'settings'), false
+            Utils.recursiveMerge context, _.omit(rules, 'settings'), false
 
           resolve context
         catch e

@@ -1,10 +1,11 @@
 # Adds these new settings and rules
 
 settings:
-  toClean: ['lib']
-  toDistclean: ['node_modules']
+  clean:
+    path: ['lib']
+    distclean: ['node_modules']
 clean:
-  - exec: rm -rf %toClean
+  - exec: rm -rf %clean.path%
 distclean:
   - task: clean
-  - exec: rm -rf %toDistclean
+  - exec: rm -rf %clean.distclean%

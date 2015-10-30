@@ -13,26 +13,15 @@ Q = require 'q'
 @settings =
   grabTmpDir: '.'
 
-@actions = (logging, config) ->
+@actions = (logging, config, helpers) ->
   grab: (command, settings) ->
     # check grabTmpDir is correct and does exist
     resolvedPath = path.resolve settings.grabTmpDir
     unless fs.existsSync resolvedPath
       throw new Error "Path #{settings.grabTmpDir} does not exist!"
 
-    matches = command.match config.REPLACE_SETTING_RE
-
-    if matches
-      matches.forEach (settingToReplace) ->
-        # Remove leading '%'
-        lookupSetting = settingToReplace[1...]
-        unless settingValue = settings[lookupSetting]
-          throw new Error "Setting '#{lookupSetting}' not found for command '#{command}!'"
-
-        if settingValue instanceof Array
-          settingValue = settingValue.join ' '
-
-        command = command.replace settingToReplace, settingValue
+    command = helpers.parseCommand command, (lookupSetting) ->
+      helpers.resolve settings, lookupSetting
 
     logging.info "+ Grab #{command} (destination: #{resolvedPath})"
 

@@ -2,5 +2,5 @@ init:
   plugins:
     - "packagejson"
 test:
-  - echo Build version %version
+  - echo Build version %version%
   - echo Done.
