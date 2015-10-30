@@ -307,8 +307,9 @@ Nice, isn't it ?
   """
 ```
 
-When using ```Coffeescript``` or ```Javascript``` you will have more leverage on
-what you can do. Plugins are run within a [sandbox-runner](https://github.com/timnew/sandbox-runner).
+When using ```Coffeescript``` or ```Javascript``` you will be able to have better control over what will be run. Plugins are run within a [sandbox-runner](https://github.com/timnew/sandbox-runner).
+
+> Due to the sandbox nature of the plugin, these parameters (```settings```, ```rules```, ```actions```) must be set within the ```this``` context.
 
 After parsing, ```settings``` and ```rules``` will be evaluated either as a function or as a Plain Old Object.
 
@@ -318,6 +319,8 @@ ordered plugins loading correctly ! (see ```init```)
 
 ### Require example
 
+This is an example on how you can set _static_ settings. Static should be understood as _invariable to other settings_.
+
 ```coffee
 fs = require 'fs'
 packagejson = JSON.parse fs.readFileSync 'package.json'
@@ -325,7 +328,7 @@ packagejson = JSON.parse fs.readFileSync 'package.json'
 @settings =
   name: packagejson.name
   version: packagejson.version
-  licenses: packagejson.licenses
+  license: packagejson.license or packagejson.licenses
 ```
 
 As you can see, you can do pretty much anything you want to customize your own build with external tools and libraries.

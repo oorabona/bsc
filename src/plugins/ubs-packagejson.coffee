@@ -11,4 +11,4 @@ packagejson = JSON.parse fs.readFileSync 'package.json'
 @settings =
   name: packagejson.name
   version: packagejson.version
-  licenses: packagejson.licenses
+  license: packagejson.license or packagejson.licenses
