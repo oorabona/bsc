@@ -154,7 +154,6 @@ __ShellJS__ handles the following common shell commands:
 - ```chmod```
 - ```cp```
 - ```dirs```
-- ```env```
 - ```exit```
 - ```grep```
 - ```ls```
@@ -166,7 +165,6 @@ __ShellJS__ handles the following common shell commands:
 - ```rm```
 - ```sed```
 - ```test```
-- ```which```
 
 > By default, on Windows __shellCmd__ is ```cmd.exe``` and __shellArgs__ ```-c```.
 > Otherwise, it's ```/bin/sh``` and ```-c``` respectively.

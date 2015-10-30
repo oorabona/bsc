@@ -10,8 +10,8 @@ Utils = require './utils'
 
 # commands to copy from shelljs into globals.
 ShellCommands = [
-  "cat", "cd", "chmod", "cp", "dirs", "env", "exit", "grep",
-  "ls", "mkdir", "mv", "popd", "pushd", "pwd", "rm", "sed", "test", "which"
+  "cat", "cd", "chmod", "cp", "dirs", "exit", "grep",
+  "ls", "mkdir", "mv", "popd", "pushd", "pwd", "rm", "sed", "test"
 ]
 
 Dispatch =

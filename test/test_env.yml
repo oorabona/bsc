@@ -1,9 +1,8 @@
 test:
-  - env
+  - 'which env || [ "$?" = "0" ] && env'
   - echo $WTF
   - env: WTF=still works!
   - echo $WTF
   - env: BBQ=bbq $WTF
   - echo $BBQ
-  - env
   - echo Done.
