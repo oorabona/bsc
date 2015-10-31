@@ -9,5 +9,5 @@ install:
   # Ensure source install works and compiles correctly
   - npm install
   # test our module
-  - npm test
+  - UBS_OPTS="-D" npm test
 after_success:
