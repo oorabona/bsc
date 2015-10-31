@@ -46,6 +46,27 @@ resolve = (from, what) ->
 
   o
 
+setAttribute = (from, key, value) ->
+  if typeof from isnt 'object' or typeof key isnt 'string'
+    throw new TypeError "setAttribute(from: Object, key: String, value: *), got (#{typeof from}, #{typeof what})"
+
+  o = from
+  w = key.replace /\[(\w+)\]/g, '.$1'  # convert indexes to properties
+  w = w.replace /^\./, ''               # strip the leading dot
+  a = w.split '.'
+  {length} = a
+
+  for k,i in a
+    if i < length - 1
+      if typeof o[k] isnt 'undefined'
+        o = o[k]
+      else
+        o[k] = if /[0-9]+/.test a[i+1] then [] else {}
+        o = o[k]
+    else o[k] = value
+
+  from
+
 omit = (obj, elements) ->
   if typeof obj isnt 'object'
     throw new TypeError 'omit(Object, [elements to omit])'
@@ -83,6 +104,16 @@ parseCommand = (command, settings, callback) ->
 
   command
 
+# Adapted from https://stackoverflow.com/questions/586182/how-do-i-insert-an-item-into-an-array-at-a-specific-index
+# What:
+#   inserts arguments 'sources' flattened if type is Array at specific index in dest array
+# Syntax:
+#   insertInArray(dest, index, value1, value2, ..., valueN)
+insertInArray = (dest, index, sources...) ->
+  index = Math.min index, dest.length
+  arguments.length > 2 and dest.splice.apply dest, [index, 0].concat [].pop.call(sources)
+  dest
+
 module.exports = exports = {
   toType: toType
   recursiveMerge: recursiveMerge
@@ -90,4 +121,6 @@ module.exports = exports = {
   resolve: resolve
   parseCommand: parseCommand
   omit: omit
+  insertInArray: insertInArray
+  setAttribute: setAttribute
 }

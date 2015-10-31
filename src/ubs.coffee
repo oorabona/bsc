@@ -36,7 +36,18 @@ shortOptions =
   t: [ "--tasks" ]
 
 main = ->
-  options = parseOptions process.argv
+  {argv} = process
+
+  # Let's see if we have options defined in calling environment
+  if ubs_env = process.env['UBS_OPTS']
+    env_argv = ubs_env.split(' ').filter (el) -> !!el
+    # Insert starting argv[2] everything from UBS_OPTS
+    Utils.insertInArray argv, 2, env_argv
+
+  # Because we do prepend arguments from environment variable, they can still be
+  # overridden by command line parameters.
+  options = parseOptions argv
+
   return showHelp() if options.help
   return showVersion() if options.version
 
@@ -153,7 +164,7 @@ run = (options) ->
               runList.push action: actionType, cmd: step[actionType]
               foundAction = true
           unless foundAction
-            throw new Error "Action unrecognized: #{util.inspect step}"
+            throw new Error "Unrecognized action: #{util.inspect step}"
 
     logging.debug "Sequence loaded: #{util.inspect runList}"
     logging.debug "Settings: #{util.inspect tasks.settings}"
@@ -180,7 +191,7 @@ parseOptions = (argv, slice) ->
   if options["no-colors"] then Config.useColors false
   if options.verbose then Config.setVerbose true
   if options.debug then Config.setDebug true
-  options.build ?= process.env["UBS_BUILD"] ? Config.DEFAULT_BUILD_FILE
+  options.build ?= Config.DEFAULT_BUILD_FILE
   options
 
 parseTaskList = (options) ->
@@ -190,12 +201,7 @@ parseTaskList = (options) ->
     if word.match Config.TASK_REGEX
       tasklist.push word
     else if (m = word.match Config.SETTING_RE)
-      segments = m[1].split(".")
-      tmp = settings
-      for segment in segments[...-1]
-        tmp[segment] = {}
-        tmp = tmp[segment]
-      tmp[segments[segments.length - 1]] = m[2]
+      settings = Utils.setAttribute settings, m[1], m[2]
     else
       throw new Error("I don't know what to do with '#{word}'")
   options.tasklist = tasklist
