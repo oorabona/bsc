@@ -15,9 +15,9 @@ Also, it was intended to be as simple as possible to call from ```npm run``` so 
 ## How it works
 
 There are three kind of items you can find:
-- init: set up plugin, global config etc.
-- settings: contains variables (which can be overridden) used by plugins, or not, at runtime.
-- tasks: a target like ```install```, ```test``` and all others...
+- __init__: load plugins, holds global config etc.
+- __settings__: contains variables (which can be overridden) used by plugins, or your build process, at runtime.
+- __tasks__: a target like ```install```, ```test``` and all others...
 
 You need a ```build.yml``` in your __current working directory__ and that's it.
 
@@ -34,34 +34,44 @@ $ ubs clean test
 
 Targets will be run in sequence and depending tasks will be automatically added.
 
+You can change ```settings``` from the commandline. E.g.:
+
 ```shell
-$ ubs --help
-ubs 0.4.0
-usage: ubs [options] [task-setting]* [task-name]*
-general options are listed below. task-settings are all of the form
-"<name>=<value>".
-example:
-  ubs -b build.yml build debug=true test
-  loads build from build.yml, adds { debug: "true" } to the
-  global settings object, then runs task "build" followed by task "test".
-options:
-  --buildfile FILENAME (-b)
-      use a specific rules file (default: build.yml)
-  --tasks (-t)
-      show the list of tasks and their descriptions
-  --watch (-w)
-      keep running (until killed), watching for changed files
-  --help
-      this help
-  --version
-      show the version string and exit
-  --verbose (-v)
-      log more about what it's doing
-  --debug (-D)
-      log quite a lot more about what it's thinking
-  --colors / --no-colors
-      override the color detection to turn on/off terminal colors
+$ ubs test mocha.display='html'
 ```
+
+Will change the display output when calling ```mocha```, see ```mocha``` plugin for details.
+
+You can use _dot notation_ to select a setting and this works for arrays too. E.g:
+
+```shell
+$ ubs clean.path[1]=foo clean
+```
+
+Will change the second element of the ```clean``` plugin ```path``` array of items to clean.
+
+Lastly, you can use environment variable ```UBS_OPTS``` to pass arguments prior to command line arguments.
+I.e:
+
+```shell
+$ UBS_OPTS="-v clean.path[1]=bar" ubs clean.path[1]=foo clean
+```
+
+Will be expanded as:
+
+```shell
+$ ubs -v clean.path[1]=bar clean.path[1]=foo clean
+```
+
+The final value for ```clean.path[1]``` will be ```foo``` not ```bar```.
+Precedence works like the following (from highest to lowest priority):
+- command line
+- environment variable UBS_OPTS
+- build.yml
+- plugin defaults
+- core defaults (if they exist)
+
+For a complete list of available commands, use ```ubs --help```.
 
 > ##Note:
 > At the moment _watch_ is not implemented, see [TODO](#TODO)
@@ -105,7 +115,7 @@ settings:
     useCoffee: true
 ```
 
-A special kind of setting __exec__ is used to change behavior of all exec commands.
+A special kind of setting, __exec__, is used to change behavior of all exec commands.
 
 ```yaml
 settings:
@@ -116,6 +126,9 @@ settings:
       CPPFLAGS: "-fPIC"
       CFLAGS: "-O3"
 ```
+
+> By default, on Windows __shellCmd__ is ```cmd.exe``` and __shellArgs__ ```/c```.
+> Otherwise, it's ```/bin/sh``` and ```-c``` respectively.
 
 And all the rest are targets. By default ```ubs``` looks for ```install```.
 
@@ -145,6 +158,9 @@ install_plugins:
 ```
 
 Each sequence can either be a command to ```exec```ute, this is the default, or an action, like calling a new ```task```.
+
+> An empty line (with only a dash and nothing else) ends processing the current target.
+
 Except some shell commands which are executed with [shelljs](https://github.com/arturadib/shelljs), all commands are currently run with the specified shell and its attributes.
 
 __ShellJS__ handles the following common shell commands:
@@ -165,9 +181,6 @@ __ShellJS__ handles the following common shell commands:
 - ```rm```
 - ```sed```
 - ```test```
-
-> By default, on Windows __shellCmd__ is ```cmd.exe``` and __shellArgs__ ```-c```.
-> Otherwise, it's ```/bin/sh``` and ```-c``` respectively.
 
 Along with ```task```, you can also use one of the following builtin actions:
 
@@ -307,7 +320,13 @@ Nice, isn't it ?
   """
 ```
 
-When using ```Coffeescript``` or ```Javascript``` you will be able to have better control over what will be run. Plugins are run within a [sandbox-runner](https://github.com/timnew/sandbox-runner).
+The rule ```mocha-test``` is semantically equivalent to:
+
+```yaml
+- %mocha.bin% -R %mocha.display% %mocha.options%
+```
+
+But by writing a script, we ease the process of conditions. This is a simple example but with either  ```Coffeescript``` or ```Javascript``` you will be able to have better control over what will be run. Including ```require``` other modules. Plugins are run within a [sandbox-runner](https://github.com/timnew/sandbox-runner).
 
 > Due to the sandbox nature of the plugin, these parameters (```settings```, ```rules```, ```actions```) must be set within the ```this``` context.
 
@@ -350,8 +369,6 @@ When plugin is loaded, if ```actions``` exists, it must be a function. This func
 - config: internal __config__ instance
 - helpers: internal __utils__ instance
 
-With these two you can co-operate with __UBS__ internals without hassle.
-
 You may have more than one ```action``` defined by a plugin but you cannot redefine an existing action (like ```exec``` for example).
 
 Each action take two parameters, the ```command``` is the full line from the build file, with ```%...%```, and the ```settings```.
@@ -361,7 +378,7 @@ To process automatically these templates, you need to call from __inside__ your 
 command = helpers.parseCommand command, settings
 ```
 
-If you need special care about how you handle tokenization everytime it is parsed, e.g. variable can be an array, or some exotic type, then a callback is provided.
+If you need special care about how you handle tokenization everytime plugin command is parsed, e.g. variable can be an array, or some exotic type, then a callback is provided.
 
 ```coffee
 command = helpers.parseCommand command, settings, (settingValue) ->
