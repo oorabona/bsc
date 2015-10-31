@@ -14,7 +14,7 @@ settings:
   srcPath: 'src'
   libPath: 'lib'
   clean:
-    clean: ['lib/']
+    path: ['lib/']
     distclean: ['node_modules']
   mocha:
     useCoffee: true
