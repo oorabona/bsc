@@ -30,7 +30,7 @@ Q = require 'q'
     responseCode = null
 
     outputStream = fs.createWriteStream path.join resolvedPath, path.basename command
-    outputStream.on 'end', ->
+    outputStream.on 'finish', ->
       deferred.resolve responseCode
 
     request.get(command)

@@ -64,6 +64,7 @@ describe 'Plugins', ->
       exec("#{binubs} -v -b test/test_plugin_grab.yml test").then (p) ->
         expect(p.stdout.toString()).to.match /Retrieving/
         expect(p.stdout.toString()).to.match /statusCode:\ 200\./
+        expect(p.stdout.toString()).to.match /Done\./
         expect(fs.existsSync 'test/master.zip').to.be.ok()
         done()
 
