@@ -69,11 +69,10 @@ Plugins =
       catch e
         throw new Error "Could not find plugin '#{foundPlugin}' in NPM modules"
 
-      # If we have something but seems empty, throw
-      if pContext instanceof Object
-        unless pContext.settings or pContext.rules
-          throw new Error "Plugin empty or bad: #{pluginName} (#{foundPlugin})"
-
+      # If plugin does not return an Object, tell user
+      unless pContext instanceof Object
+        throw new Error "Plugin empty or unparseable: #{pluginName} (#{foundPlugin})"
+      else
         if pContext.settings
           settings = if typeof pContext.settings is 'function'
             pContext.settings()
@@ -87,8 +86,8 @@ Plugins =
           if 'string' is Utils.toType rules
             rules = yaml.safeLoad rules, yaml.JSON_SCHEMA
 
-          # Make sure settings is not overwritten by rules.
-          Utils.recursiveMerge context, Utils.omit(rules, 'settings'), false
+          # Make sure neither settings nor init are overwritten by rules.
+          Utils.recursiveMerge context, Utils.omit(rules, ['settings', 'init']), false
         return Q context
 
     Q.Promise (resolve, reject, notify) ->
@@ -106,18 +105,28 @@ Plugins =
             when 'yaml'
               logging.debug "Loading YAML file #{foundPlugin}"
               pluginCtx = yaml.safeLoad code, yaml.JSON_SCHEMA
-              resolve Utils.recursiveMerge context, pluginCtx
+              resolve Utils.recursiveMerge context, pluginCtx, false
             else
-              # No ext => let's try to 'require' it (might be an installed module)
               throw new Error "Could not load #{pluginName}: #{foundPlugin} not found!"
 
+          # Enforce actions to be a function.
           if pContext.actions
-            Dispatch.extend pContext.actions logging, Config, Utils
+            if typeof pContext.actions is 'function'
+              Dispatch.extend pContext.actions logging, Config, Utils
+            else
+              throw new TypeError "Plugin #{pluginName} has actions defined in the wrong type #{typeof actions}, should be a function!"
+
+          # Settings defined in plugins can be overwritten by existing settings
+          # If defined as a function, pass current settings object as to the function.
           if pContext.settings
             settings = if typeof pContext.settings is 'function'
               pContext.settings context.settings
             else pContext.settings or {}
+
             Utils.recursiveMerge context.settings, settings, false
+
+          # If rules are defined as a function, call it with settings as argument.
+          # Either case, make sure we do not overwrite 'core' rules.
           if pContext.rules
             rules = if typeof pContext.rules is 'function'
               pContext.rules context.settings
@@ -126,8 +135,8 @@ Plugins =
             if 'string' is Utils.toType rules
               rules = yaml.safeLoad rules, yaml.JSON_SCHEMA
 
-            # Make sure settings is not overwritten by rules.
-            Utils.recursiveMerge context, Utils.omit(rules, 'settings'), false
+            # Make sure neither settings nor init are overwritten by rules.
+            Utils.recursiveMerge context, Utils.omit(rules, ['settings', 'init']), false
 
           resolve context
         catch e
