@@ -1,3 +1,7 @@
+# Logging
+# =======
+# Handles basic logging with colors.. or not!
+
 sprintf = require 'sprintf'
 strftime = require 'strftime'
 {Config} = require './config'

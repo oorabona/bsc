@@ -1,3 +1,8 @@
+# Dispatch
+# ========
+# Holds all actions and comes with 3 by default (core): "exec", "env" and "log".
+# All others are extend-ed from plugins.
+
 child_process = require 'child_process'
 shell = require 'shelljs'
 Q = require 'q'
@@ -26,14 +31,14 @@ Dispatch =
   EXEC:
   ###
   exec: (command, settings, pStdout = true) ->
-    logging.info "+ #{command}"
+    logging.debug "Uncooked command: #{command}"
 
     command = Utils.parseCommand command, settings, (settingValue) ->
       if 'array' is Utils.toType settingValue
         settingValue.join ' '
       else settingValue
 
-    logging.debug "Decoded: #{command}"
+    logging.info "+ Decoded: #{command}"
 
     # Make a new promise
     deferred = Q.defer()

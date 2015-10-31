@@ -1,3 +1,4 @@
+# Some helpers utils
 {Config} = require './config'
 logging = require "./logging"
 
@@ -46,6 +47,7 @@ resolve = (from, what) ->
 
   o
 
+# Yep looks like the preious one, this time it sets value in object at position key.
 setAttribute = (from, key, value) ->
   if typeof from isnt 'object' or typeof key isnt 'string'
     throw new TypeError "setAttribute(from: Object, key: String, value: *), got (#{typeof from}, #{typeof what})"
@@ -56,6 +58,9 @@ setAttribute = (from, key, value) ->
   a = w.split '.'
   {length} = a
 
+  # We process till before the last element because we might need to create the entry.
+  # In that case we will decide whether we need to create an Array or an Object.
+  # The former is the following element is an integer, the latter otherwise.
   for k,i in a
     if i < length - 1
       if typeof o[k] isnt 'undefined'
@@ -67,8 +72,9 @@ setAttribute = (from, key, value) ->
 
   from
 
+# Quick way to implement _.omit in CoffeeScript!
 omit = (obj, elements) ->
-  if typeof obj isnt 'object'
+  if typeof obj isnt 'object' or typeof elements is 'undefined'
     throw new TypeError 'omit(Object, [elements to omit])'
 
   if typeof elements is 'string'
@@ -79,6 +85,8 @@ omit = (obj, elements) ->
   ret[k] = v if k not in e for k,v of obj
   ret
 
+# Process commands given to a plugin based on the settings.
+# Callback is not mandatory unless you want to take care of extra handling of command.
 parseCommand = (command, settings, callback) ->
   # Automagically set identity callback if none/falsy provided.
   if typeof callback isnt 'function'

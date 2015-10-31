@@ -1,3 +1,7 @@
+# Plugins
+# =======
+# Handle plugins, whether they are JS/Coffee/YAML files in pluginPath or a NPM module to require.
+
 coffee = require 'coffee-script'
 fs = require 'fs'
 Q = require 'q'

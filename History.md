@@ -1,3 +1,8 @@
+0.6.1
+=====
+* Fixed ```grab``` plugin not resolving promise!
+* Minor cosmetic changes (comments, etc).
+
 0.6.0
 =====
 * Shows help when called without arguments instead of throwing error about file not found
@@ -24,5 +29,5 @@
 0.3.x
 =====
 * Added variables and text search/replace
-* Added actions like (e.g in a step) ```- callme: '%maybe%'```
+* Added actions like (e.g in a step) ```- callme: '%maybe'```
 * Added new plugin: ```grab```
