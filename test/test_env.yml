@@ -1,5 +1,6 @@
 test:
-  - 'which env || [ "$?" = "0" ] && env'
+  # Thing is that which returns 0 if found or 1 if not.
+  - 'which env || env'
   - echo $WTF
   - env: WTF=still works!
   - echo $WTF
