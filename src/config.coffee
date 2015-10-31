@@ -2,7 +2,7 @@ fs = require 'fs'
 path = require 'path'
 
 Config =
-  SETTING_RE: /^(\w[-\.\w]*)=(.*)$/
+  SETTING_RE: /^(.*)=(.*)$/
   TASK_REGEX: /^[a-z][-a-z0-9_]*$/
   DEFAULT_TASK: 'install'
 
