@@ -30,7 +30,7 @@ describe 'Bootstrap tests', ->
 
   it 'should be able to output log messages', (done) ->
     exec("#{binubs} -b test/helloworld.yml test").then (p) ->
-      expect(p.stderr.toString()).to.be("ERROR: error level\n")
+      expect(p.stderr.toString()).to.be '\u001b[31mERROR: error level\u001b[0m\n'
       expect(p.stdout.toString()).to.match /Hello World!/
       expect(p.stdout.toString()).to.match /Done\./
       expect(p.stdout.toString()).to.not.match /Bam!/

@@ -31,7 +31,7 @@ yaml = require 'js-yaml'
 
 Utils = require './utils'
 logging = require "./logging"
-{Config} = require "./config"
+Config = require "./config"
 Dispatch = require "./dispatch"
 plugins = require "./plugins"
 
@@ -207,10 +207,10 @@ run = (options) ->
 
 parseOptions = (argv, slice) ->
   options = nopt longOptions, shortOptions, argv, slice
-  if options.colors then Config.useColors true
-  if options["no-colors"] then Config.useColors false
-  if options.verbose then Config.setVerbose true
-  if options.debug then Config.setDebug true
+  Config.useColors !!options.colors
+  Config.useColors !options["no-colors"]
+  Config.setVerbose !!options.verbose
+  Config.setDebug !!options.debug
   options.build ?= Config.DEFAULT_BUILD_FILE
   options
 

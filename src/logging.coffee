@@ -4,7 +4,7 @@
 
 sprintf = require 'sprintf'
 strftime = require 'strftime'
-{Config} = require './config'
+Config = require './config'
 
 appStartTime = Date.now()
 

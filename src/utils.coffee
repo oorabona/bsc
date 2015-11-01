@@ -1,5 +1,5 @@
 # Some helpers utils
-{Config} = require './config'
+Config = require './config'
 logging = require "./logging"
 
 # Kudos go to http://javascriptweblog.wordpress.com/2011/08/08/fixing-the-javascript-typeof-operator/

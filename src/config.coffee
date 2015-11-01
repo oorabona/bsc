@@ -3,7 +3,7 @@
 fs = require 'fs'
 path = require 'path'
 
-Config =
+module.exports = exports =
   SETTING_RE: /^(.*)=(.*)$/
   TASK_REGEX: /^[a-z][-a-z0-9_]*$/
   DEFAULT_TASK: 'install'
@@ -49,11 +49,3 @@ Config =
   monitor: (value) ->
     if value? then @_monitor = value
     @_monitor
-
-  # for tests
-  reset: ->
-    @_monitor = true
-
-Config.reset()
-
-exports.Config = Config

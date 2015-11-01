@@ -9,7 +9,7 @@ Q = require 'q'
 util = require 'util'
 
 logging = require './logging'
-{Config} = require './config'
+Config = require './config'
 Utils = require './utils'
 
 # commands to copy from shelljs into globals.
@@ -141,21 +141,12 @@ Dispatch =
 
       output = command[level]
 
-    matches = output.match Config.REPLACE_SETTING_RE
+    toLog = Utils.parseCommand output, settings, (settingValue) ->
+      if 'array' is Utils.toType settingValue
+        settingValue.join ' '
+      else settingValue
 
-    if matches
-      matches.forEach (settingToReplace) ->
-        # Remove leading '%'
-        lookupSetting = settingToReplace[1...]
-        unless settingValue = settings[lookupSetting]
-          throw new Error "Setting '#{lookupSetting}' not found for command '#{output}!'"
-
-        if 'array' is Utils.toType settingValue
-          settingValue = settingValue.join ' '
-
-        output = output.replace settingToReplace, settingValue
-
-    logging[level] output
+    logging[level] toLog
     Q true
 
 module.exports = Dispatch

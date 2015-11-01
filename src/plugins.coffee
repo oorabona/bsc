@@ -16,7 +16,7 @@ require 'coffee-script/register'
 logging = require "./logging"
 Utils = require './utils'
 Dispatch = require "./dispatch"
-{Config} = require './config'
+Config = require './config'
 
 plugins = {}
 pluginPaths = []
