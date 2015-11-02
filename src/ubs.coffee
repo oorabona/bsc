@@ -54,6 +54,7 @@ shortOptions =
   v: [ "--verbose" ]
   D: [ "--debug" ]
   t: [ "--tasks" ]
+  nc: [ "--no-colors"]
 
 main = ->
   {argv} = process
@@ -101,6 +102,7 @@ run = (options) ->
 
   # Load build.yml or result of options.build
   buildFile = options.build
+
   Q.Promise (resolve, reject, notify) ->
     fs.readFile buildFile, "utf8", (error, code = {}) ->
       # If something bad happened, like a ENOENT, it might be just the user asking for help.
@@ -111,38 +113,38 @@ run = (options) ->
           notify HELP
 
       resolve yaml.safeLoad code, yaml.JSON_SCHEMA
-  .then (tasks) ->
-    Utils.extend tasks.settings, tasklist[1]
-    logging.debug "Tasks #{util.inspect tasks, undefined, 4}"
+  .then (build) ->
+    Utils.extend build.settings, tasklist[1]
+    logging.debug "Tasks #{util.inspect build, undefined, 4}"
 
     # That may happen, log for informational purposes only.
-    unless tasks.settings
+    unless build.settings
       logging.info 'Settings empty. Using defaults.'
-      tasks.settings = {}
+      build.settings = {}
 
     # If we have init then parse it before all other action
     # At the moment only 'plugins' is recognized but it may allow future
     # extensions hopefully quite easily !
-    if tasks.init?.plugins
+    if build.init?.plugins
       # If build specifies additional pluginPath then add them now
       addPluginPath = (path) ->
         plugins.addPath path
         logging.debug "Plugin path #{path} added."
         return
 
-      if tasks.settings.pluginPath instanceof Array
-        tasks.settings.pluginPath.forEach addPluginPath
-      else if tasks.settings.pluginPath
-        addPluginPath tasks.settings.pluginPath
+      if build.settings.pluginPath instanceof Array
+        build.settings.pluginPath.forEach addPluginPath
+      else if build.settings.pluginPath
+        addPluginPath build.settings.pluginPath
 
       logging.info "Plugins loading path: #{plugins.getPaths().join ' then '}"
 
       # Plugin load is asynchronous
-      Q.all tasks.init.plugins.map (plugin) ->
+      Q.all build.init.plugins.map (plugin) ->
         logging.info "Loading plugin: #{plugin}"
-        plugins.load plugin, tasks
+        plugins.load plugin, build
     else
-      [tasks]
+      [build]
   .then (context) ->
     if options.tasks
       return Object.keys context[0]
@@ -207,10 +209,9 @@ run = (options) ->
 
 parseOptions = (argv, slice) ->
   options = nopt longOptions, shortOptions, argv, slice
-  Config.useColors !!options.colors
-  Config.useColors !options["no-colors"]
-  Config.setVerbose !!options.verbose
-  Config.setDebug !!options.debug
+  Config.useColors options.colors
+  Config.setVerbose options.verbose
+  Config.setDebug options.debug
   options.build ?= Config.DEFAULT_BUILD_FILE
   options
 

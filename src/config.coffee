@@ -8,7 +8,7 @@ module.exports = exports =
   TASK_REGEX: /^[a-z][-a-z0-9_]*$/
   DEFAULT_TASK: 'install'
 
-  REPLACE_SETTING_RE: /\%(\w[-\.\w]*)%/g
+  REPLACE_SETTING_RE: /\%(\w[\[\]\-\.\w]*)\%/g
 
   DEFAULT_BUILD_FILE: 'build.yml'
 
@@ -45,7 +45,3 @@ module.exports = exports =
       @isDebug = bool
       if bool then @isVerbose = true
     @isDebug
-
-  monitor: (value) ->
-    if value? then @_monitor = value
-    @_monitor

@@ -3,20 +3,17 @@ Run the binary and check results returned by example build.yml test cases
 ###
 
 expect = require 'expect.js'
-mocha_sprinkles = require 'mocha-sprinkles'
+{exec, done} = require 'mocha-sprinkles'
 
 Q = require 'q'
 fs = require 'fs'
-
-exec = mocha_sprinkles.exec
-done = mocha_sprinkles.done
 
 binubs = "#{process.cwd()}/bin/ubs"
 
 describe 'Bootstrap tests', ->
   it "responds to --help", (done) ->
     exec("#{binubs} --help").then (p) ->
-      expect(p.stderr.toString()).to.be("")
+      expect(p.stderr.toString()).to.be ''
       expect(p.stdout.toString()).to.match /usage:/
       expect(p.stdout.toString()).to.match /options:/
       done()
@@ -30,7 +27,7 @@ describe 'Bootstrap tests', ->
 
   it 'should be able to output log messages', (done) ->
     exec("#{binubs} -b test/helloworld.yml test").then (p) ->
-      expect(p.stderr.toString()).to.be '\u001b[31mERROR: error level\u001b[0m\n'
+      expect(p.stderr.toString()).to.be 'WARN: warning level\nERROR: error level\n'
       expect(p.stdout.toString()).to.match /Hello World!/
       expect(p.stdout.toString()).to.match /Done\./
       expect(p.stdout.toString()).to.not.match /Bam!/
@@ -70,4 +67,4 @@ describe 'Plugins', ->
 
   after ->
     # We completed our task, remove created files
-    fs.unlinkSync "test/master.zip"
+    fs.unlinkSync 'test/master.zip'
