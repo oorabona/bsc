@@ -1,6 +1,6 @@
 {
   "name": "ubs",
-  "version": "0.6.1",
+  "version": "0.6.2",
   "description": "Unified Build System",
   "main": "./lib/ubs",
   "scripts": {
@@ -21,7 +21,6 @@
     "tool",
     "make",
     "scaffold",
-    "async",
     "task",
     "cli",
     "yaml",
@@ -34,20 +33,19 @@
   },
   "homepage": "https://github.com/oorabona/ubs",
   "devDependencies": {
-    "expect.js": "^0.3.1",
-    "mocha": "^2.0.1",
-    "mocha-sprinkles": "^2.0.1"
+    "coffee-script": "latest",
+    "expect.js": "latest",
+    "mocha": "latest",
+    "mocha-sprinkles": "latest"
   },
   "dependencies": {
-    "coffee-script": "^1.8.0",
-    "js-yaml": "^3.2.3",
-    "nopt": "^3.0.1",
-    "q": "^1.1.2",
-    "request": "^2.65.0",
-    "sandbox-runner": "^0.1.1",
-    "shelljs": "^0.3.0",
-    "sprintf": "^0.1.5",
-    "strftime": "^0.8.2"
+    "js-yaml": "latest",
+    "nopt": "latest",
+    "q": "latest",
+    "request": "latest",
+    "sandbox-runner": "latest",
+    "shelljs": "latest",
+    "sprintf": "latest"
   },
   "files": [
     "build.yml",
