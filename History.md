@@ -1,3 +1,10 @@
+0.6.2
+=====
+* Config can now be addressed directly, no more indirection when requiring.
+* Update all deps to their latest version
+* Fixed ```--no-colors``` option
+* Code cleanup
+
 0.6.1
 =====
 * Fixed ```grab``` plugin not resolving promise!
