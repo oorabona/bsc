@@ -1,6 +1,6 @@
 {
   "name": "ubs",
-  "version": "0.6.3",
+  "version": "0.6.4",
   "description": "Unified Build System",
   "main": "./lib/ubs",
   "scripts": {
@@ -44,7 +44,7 @@
     "q": "latest",
     "request": "latest",
     "sandbox-runner": "latest",
-    "shelljs": "latest",
+    "shelljs": "^0.5.3",
     "sprintf": "latest"
   },
   "files": [
