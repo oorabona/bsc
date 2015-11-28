@@ -24,14 +24,14 @@ Q = require 'q'
 
     logging.info "+ Grab #{command} (destination: #{resolvedPath})"
 
-    # Init a new promise, promise me a responseCode sometime
+    # Init a new promise, promise me a statusCode sometime
     deferred = Q.defer()
     {promise} = deferred
-    responseCode = null
+    statusCode = null
 
     outputStream = fs.createWriteStream path.join resolvedPath, path.basename command
     outputStream.on 'finish', ->
-      deferred.resolve responseCode
+      deferred.resolve statusCode
 
     request.get(command)
       .on 'error', (error) ->
