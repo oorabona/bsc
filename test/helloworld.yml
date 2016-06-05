@@ -2,7 +2,7 @@ settings:
   version: "1.0"
 test:
   - echo Hello World!
-  - log: notice level %version
+  - log: notice level %version%
   - log:
       debug: debug level
   - log:
