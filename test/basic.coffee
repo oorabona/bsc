@@ -17,6 +17,7 @@ describe 'Bootstrap tests', ->
       expect(p.stdout.toString()).to.match /usage:/
       expect(p.stdout.toString()).to.match /options:/
       done()
+    , done
 
   it 'should error if build file is not found', (done) ->
     exec("#{binubs} -b test/notfound.yml").then (p) ->
@@ -32,38 +33,40 @@ describe 'Bootstrap tests', ->
       expect(p.stdout.toString()).to.match /Done\./
       expect(p.stdout.toString()).to.not.match /Bam!/
       done()
+    , done
 
   it 'should be able to get and set environment variables', (done) ->
-    exec("#{binubs} -b test/test_env.yml test", env: WTF: "works!").then (p) ->
-      expect(p.stdout.toString()).to.match /bbq still works!/
+    exec("#{binubs} -b test/test_env.yml test").then (p) ->
+      expect(p.stdout.toString()).to.match /composite\: still works!/
       expect(p.stdout.toString()).to.match /Done\./
       done()
+    , done
 
   # Call another instance of ourselves from build script to ensure we correctly
   # propagate environment variables both ways (parent -> child and child->parent).
-  # We also override settings from command line to specify ubs instead of setting
-  # "_" environment variable which might not be possible under some testing environments.
-  it 'should be able to run nested instance and back propagate status', (done) ->
-    exec("#{binubs} -b test/test_ipc_child.yml test bin=#{binubs}").then (p) ->
+  it 'should be able to run nested instance and back propagate status', (done, error) ->
+    exec("#{binubs} -b test/test_ipc_child.yml test").then (p) ->
       expect(p.stdout.toString()).to.match /Expecting test to be working!/
       done()
+    , error
 
 describe 'Plugins', ->
   describe 'Package JSON', ->
-    it 'should be able to output version from packagejson', (done) ->
+    it 'should be able to output version from packagejson', (done, error) ->
       exec("#{binubs} -b test/test_plugin_packagejson.yml test").then (p) ->
         expect(p.stdout.toString()).to.match /version [0-9]+\.[0-9]+/
         expect(p.stdout.toString()).to.match /Done\./
         done()
+      , error
 
   describe 'Grab', ->
-    it 'should be able to retrieve this package\'s master zip file', (done) ->
-      exec("#{binubs} -v -b test/test_plugin_grab.yml test").then (p) ->
+    it 'should be able to retrieve this package\'s master zip file', (done, error) ->
+      exec("#{binubs} -b test/test_plugin_grab.yml test").then (p) ->
         expect(p.stdout.toString()).to.match /Retrieving/
-        expect(p.stdout.toString()).to.match /statusCode:\ 200\./
         expect(p.stdout.toString()).to.match /Done\./
         expect(fs.existsSync 'test/master.zip').to.be.ok()
         done()
+      , error
 
   after ->
     # We completed our task, remove created files
