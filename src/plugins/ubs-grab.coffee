@@ -22,7 +22,7 @@ Q = require 'q'
 
     command = helpers.parseCommand command, settings
 
-    logging.info "+ Grab #{command} (destination: #{resolvedPath})"
+    logging.info "+ Grab: Retrieving #{command} (destination: #{resolvedPath})"
 
     # Init a new promise, promise me a statusCode sometime
     deferred = Q.defer()
@@ -37,9 +37,9 @@ Q = require 'q'
       .on 'error', (error) ->
         deferred.reject error
       .on 'response', (response) ->
-        logging.debug "Grab server response: #{util.inspect response}"
+        logging.debug "+ Grab: server response: #{util.inspect response}"
         {statusCode} = response
-        logging.info "+ Grab server response statusCode: #{statusCode}."
+        logging.info "+ Grab: server response statusCode: #{statusCode}."
       .pipe outputStream
 
     promise

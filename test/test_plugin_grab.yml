@@ -4,7 +4,33 @@ init:
 settings:
   fileUrl: 'https://github.com/oorabona/ubs/archive/master.zip'
   grabTmpDir: test
+  target: 'test/master.zip'
+
 test:
-  - echo Retrieving %fileUrl%
+  - log: Checking whether we have curl or wget somewhere...
+  - |
+    c=$(which curl)
+    w=$(which wget)
+    if [ "$c" != "" ]
+    then
+      %ubs% using=$c curl
+    elif [ "$w" != "" ]
+    then
+      %ubs% using=$w wget
+    else
+      %ubs% grab
+    fi
+  - log: Done.
+
+curl:
+  - log: Retrieving %fileUrl% using %using%
+  - "%using% %fileUrl% > %target%"
+
+wget:
+  - log: Retrieving %fileUrl% using %using%
+  - "%using% -qO- %fileUrl% > %target%"
+
+grab:
+  - log:
+      warning: Neither curl nor wget could be found! Using internal grab...
   - grab: "%fileUrl%"
-  - echo Done.
