@@ -1,6 +1,7 @@
-# Dispatch
-# ========
-# Holds all actions and comes with 3 by default (core): "exec", "env" and "log".
+# Dispatch actions
+# ================
+# Holds all actions and dispatch according to input script.
+# It comes with 3 'core' modules: "exec", "env" and "log".
 # All others are extend-ed from plugins.
 
 child_process = require 'child_process'
@@ -15,7 +16,7 @@ Utils = require './utils'
 # commands to copy from shelljs into globals.
 ShellCommands = [
   "cat", "cd", "chmod", "cp", "dirs", "exit", "grep",
-  "ls", "mkdir", "mv", "popd", "pushd", "pwd", "rm", "sed", "test"
+  "ls", "mkdir", "mv", "popd", "pushd", "pwd", "sed", "test"
 ]
 
 Dispatch =
@@ -39,8 +40,9 @@ Dispatch =
       else settingValue
 
     logging.info "+ Decoded: #{command}"
+    logging.debug "Settings: #{util.inspect settings, undefined, 4}"
 
-    # Make a new promise
+    # I promise...
     deferred = Q.defer()
     promise = deferred.promise
 
@@ -56,7 +58,7 @@ Dispatch =
       # check return value
       if err = shell.error()?[...-1]
         deferred.reject "Command '#{command}' returned '#{err}'"
-      deferred.resolve shellCode ? 'success'
+      deferred.resolve !!shellCode
     else
       execSettings = env: settings.exec.env
       execSettings.cwd ?= process.cwd()
@@ -76,9 +78,13 @@ Dispatch =
       # At the moment it is activated everytime. It might be an issue with some
       # commands, which would lead to a complete crash.
       # We'll see when that happens :)
-      execSettings.stdio = [null, "pipe", process.stderr, "ipc"]
+      if pStdout
+        execSettings.stdio = [null, "inherit", process.stderr, "ipc"]
+      else
+        execSettings.stdio = [null, "pipe", process.stderr, "ipc"]
 
       stdout = ""
+      exitCode = 0
 
       command = [ settings.exec.shellCmd, settings.exec.shellArgs, command ]
 
@@ -88,46 +94,65 @@ Dispatch =
       p.on 'error', (error) ->
         deferred.reject "Child error: #{util.inspect error}"
 
-      # live stream output
-      p.stdout.on 'data', (chunk) ->
-        stdout += chunk
-        if pStdout
-          process.stdout.write chunk
+      p.stdout?.on 'data', (chunk) ->
+        stdout += chunk.toString()
+        logging.debug "stdout: #{stdout}"
+        return
+
+      # If we have something in stdout, we will wait till all streams are closed.
+      # Otherwise assume the exit code as the resolved promise.
+      p.on 'exit', (code) ->
+        exitCode = code
 
       p.on 'close', (code, signal) ->
-        logging.debug "spawn #{p.pid} finished"
+        logging.debug "spawn #{p.pid} finished: #{stdout}"
 
-        # Remove last character (\n)
-        deferred.resolve stdout?[...-1]
+        # Remove last character (\n) if we actually have something in stdout
+        if stdout.length > 0
+          deferred.resolve stdout?[...-1]
+        else
+          deferred.resolve !exitCode
 
-      # IPC channel back propagates environment to parent
+      # # IPC channel back propagates environment to parent
       p.on 'message', (message) ->
-        unless message.tasks?.settings?.exec
+        # We expect a message with an array of results.
+        # NOTE: that may or may not interfere with programs already using IPC.
+        if 'array' isnt Utils.toType message.results
           logging.info "IPC message #{util.inspect message, undefined, 4} not understood"
-        settings.exec.env = message.tasks.settings.exec.env
+        else
+          message.results.forEach (result, index) ->
+            if !!result.ok
+              logging.debug "Result #{index} is ok, committing."
+              Utils.extend settings.exec.env, result.env
+            else
+              logging.error "Result #{index} is *NOT* ok. Result: #{util.inspect result}"
 
       promise.process = p
     promise
 
   env: (command, settings) ->
-    logging.info "+ #{command}"
+    logging.info "+ Set environment: #{util.inspect command, undefined, 4}"
 
-    # We will propagate changes upstream to build global environment
-    envSettings = settings.exec ? {}
-    envSettings.env ?= process.env
-
-    # Evaluate right hand side using shell command "echo"
-    # m[1] contains key   m[2] contains value
-    if m = command.match Config.SETTING_RE
-      @exec("echo #{m[2]}", settings, false).then (result) ->
-        return envSettings.env[m[1]] = result
+    if typeof command is 'string'
+      # Evaluate right hand side using shell command "echo"
+      # m[1] contains key   m[2] contains value
+      if m = command.match Config.SETTING_RE
+        @exec("echo #{m[2]}", settings, false).then (result) ->
+          # We propagate changes upstream to build global environment
+          env = {}
+          env[m[1]] = result
+          [true, env]
+      else
+        throw new Error "Invalid environment setting: #{command}"
     else
-      throw new Error "Invalid environment setting: #{command}"
+      # Utils.extend envSettings, command
+      logging.debug "Environment: #{util.inspect command, undefined, 4}"
+      Q [true, command]
 
   # Log things :)
   # Command may have a subkey indicating log level (by default notice).
   # Ex:
-  #   - log: "This is a 'notice' message version %version"
+  #   - log: "This is a 'notice' message version %version%"
   #   - log: warn: "This is a warning !"
   #   - log: debug: "This will be shown in debug mode only."
   log: (command, settings) ->
@@ -146,7 +171,7 @@ Dispatch =
         settingValue.join ' '
       else settingValue
 
-    logging[level] toLog
+    logging[level] toLog, settings.colors[level]
     Q true
 
 module.exports = Dispatch
