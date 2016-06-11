@@ -60,7 +60,8 @@ setAttribute = (from, key, value) ->
 
   # We process till before the last element because we might need to create the entry.
   # In that case we will decide whether we need to create an Array or an Object.
-  # The former is the following element is an integer, the latter otherwise.
+  # If we have a number, it must be an array.
+  # Otherwise it will be considered as an Object property.
   for k,i in a
     if i < length - 1
       if typeof o[k] isnt 'undefined'
@@ -122,7 +123,15 @@ insertInArray = (dest, index, sources...) ->
   arguments.length > 2 and dest.splice.apply dest, [index, 0].concat [].pop.call(sources)
   dest
 
+defaults = (src, ref) ->
+  for own k,v of ref
+    if typeof src[k] is 'undefined'
+      src[k] = v
+
+  src
+
 module.exports = exports = {
+  defaults: defaults
   toType: toType
   recursiveMerge: recursiveMerge
   extend: deepExtend
