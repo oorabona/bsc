@@ -1,3 +1,10 @@
+0.6.6
+=====
+* Fixed back propagation of changes in environment variables from children to parent
+* Added ```%ubs%``` variable that points to ourselves (argv[0])
+* Fixed bug of ```coffee-script``` not being available at runtime
+* Added new tests for internal shell commands
+
 0.6.2
 =====
 * Config can now be addressed directly, no more indirection when requiring.

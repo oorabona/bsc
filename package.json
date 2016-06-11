@@ -1,6 +1,6 @@
 {
   "name": "ubs",
-  "version": "0.6.5",
+  "version": "0.6.6",
   "description": "Unified Build System",
   "main": "./lib/ubs",
   "scripts": {
@@ -32,12 +32,12 @@
   },
   "homepage": "https://github.com/oorabona/ubs",
   "devDependencies": {
-    "coffee-script": "^1.7.0",
     "expect.js": "latest",
     "mocha": "latest",
     "mocha-sprinkles": "latest"
   },
   "dependencies": {
+    "coffee-script": "^1.7.0",
     "js-yaml": "latest",
     "nopt": "latest",
     "q": "latest",
