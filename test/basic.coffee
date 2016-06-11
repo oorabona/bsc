@@ -13,9 +13,10 @@ binubs = "#{process.cwd()}/bin/ubs"
 describe 'Bootstrap tests', ->
   it "responds to --help", (done) ->
     exec("#{binubs} --help").then (p) ->
+      stdout = p.stdout.toString()
       expect(p.stderr.toString()).to.be ''
-      expect(p.stdout.toString()).to.match /usage:/
-      expect(p.stdout.toString()).to.match /options:/
+      expect(stdout).to.match /usage:/
+      expect(stdout).to.match /options:/
       done()
     , done
 
@@ -28,17 +29,19 @@ describe 'Bootstrap tests', ->
 
   it 'should be able to output log messages', (done) ->
     exec("#{binubs} -b test/helloworld.yml test").then (p) ->
+      stdout = p.stdout.toString()
       expect(p.stderr.toString()).to.be 'WARN: warning level\nERROR: error level\n'
-      expect(p.stdout.toString()).to.match /Hello World!/
-      expect(p.stdout.toString()).to.match /Done\./
-      expect(p.stdout.toString()).to.not.match /Bam!/
+      expect(stdout).to.match /Hello World!/
+      expect(stdout).to.match /Done\./
+      expect(stdout).to.not.match /Bam!/
       done()
     , done
 
   it 'should be able to get and set environment variables', (done) ->
     exec("#{binubs} -b test/test_env.yml test").then (p) ->
-      expect(p.stdout.toString()).to.match /composite\: still works!/
-      expect(p.stdout.toString()).to.match /Done\./
+      stdout = p.stdout.toString()
+      expect(stdout).to.match /composite\: still works!/
+      expect(stdout).to.match /Done\./
       done()
     , done
 
@@ -61,16 +64,18 @@ describe 'Plugins', ->
   describe 'Package JSON', ->
     it 'should be able to output version from packagejson', (done, error) ->
       exec("#{binubs} -b test/test_plugin_packagejson.yml test").then (p) ->
-        expect(p.stdout.toString()).to.match /version [0-9]+\.[0-9]+/
-        expect(p.stdout.toString()).to.match /Done\./
+        stdout = p.stdout.toString()
+        expect(stdout).to.match /version [0-9]+\.[0-9]+/
+        expect(stdout).to.match /Done\./
         done()
       , error
 
   describe 'Grab', ->
     it 'should be able to retrieve this package\'s master zip file', (done, error) ->
       exec("#{binubs} -b test/test_plugin_grab.yml test").then (p) ->
-        expect(p.stdout.toString()).to.match /Retrieving/
-        expect(p.stdout.toString()).to.match /Done\./
+        stdout = p.stdout.toString()
+        expect(stdout).to.match /Retrieving/
+        expect(stdout).to.match /Done\./
         expect(fs.existsSync 'test/master.zip').to.be.ok()
         done()
       , error
