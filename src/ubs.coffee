@@ -62,7 +62,7 @@ main = ->
   # Let's see if we have options defined in calling environment
   if ubs_env = process.env['UBS_OPTS']
     env_argv = ubs_env.split(' ').filter (el) -> !!el
-    # Insert starting argv[2] everything from UBS_OPTS
+    # Append environment set in UBS_OPTS AFTER those set in arguments.
     Utils.insertInArray argv, 2, env_argv
 
   # Because we do prepend arguments from environment variable, they can still be
@@ -122,6 +122,23 @@ run = (options) ->
       logging.info 'Settings empty. Using defaults.'
       build.settings = {}
 
+    ubs = [ process.argv[1] ]
+    for arg in options.argv.cooked
+      logging.debug "arg #{arg} tasklist #{util.inspect options.tasklist}"
+      if -1 is options.tasklist.indexOf arg
+        ubs.push arg
+
+    Utils.defaults build.settings,
+      ubs: ubs.join ' '
+      colors:
+        error: 'red'
+        warning: 'orange'
+        notice: 'yellow'
+        taskinfo: 'cyan'
+        info: 'green'
+        debug: 'purple'
+
+    logging.info "Build settings: #{util.inspect build.settings, undefined, 4}"
     # If we have init then parse it before all other action
     # At the moment only 'plugins' is recognized but it may allow future
     # extensions hopefully quite easily !
@@ -159,13 +176,7 @@ run = (options) ->
 
     # This needs to be initialized for environment / cwd updates
     tasks.settings.exec ?= {}
-    userEnv = tasks.settings.exec.env
-    tasks.settings.exec.env = process.env
-
-    # If user set environment variables, merge them into process.env
-    if userEnv
-      for key, value of userEnv
-        tasks.settings.exec.env[key] = value
+    tasks.settings.exec.env = Utils.extend process.env, tasks.settings.exec.env
 
     for task in options.tasklist then do (task) ->
       pipeline = tasks[task]
@@ -201,7 +212,17 @@ run = (options) ->
         }
 
       Dispatch[item.action](item.cmd, tasks.settings).then (result) ->
-        results.push result
+        # Make sure we are going on with an array to spread from
+        if 'array' is Utils.toType result
+          result
+        else
+          [ result, {} ]
+      .spread (isOk, env) ->
+        resultObj = ok: isOk, env: env
+        logging.debug "Spread isOk: #{isOk}"
+        logging.debug "Spread env: #{util.inspect env,undefined,4}"
+        tasks.settings.exec.env = Utils.extend tasks.settings.exec.env, env
+        results.push resultObj
         next runList
       , (error) ->
         throw "While processing #{item.cmd}: #{util.inspect error}"

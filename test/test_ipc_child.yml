@@ -4,8 +4,8 @@ settings:
       TEST: "bad"
 test:
   - echo Test is $TEST
-  # So if you want to conditionally call another build (note 'bin' must be set from commandline)
-  - '[ "$TEST" = "bad" ] && %bin% -b test/test_ipc_child.yml -D test2'
+  # 'ubs' variable now holds initial command line without any tasks list
+  - '[ "$TEST" = "bad" ] && %ubs% test2'
   # And the spawned process can also back propagate environment variables
   - echo Expecting test to be $TEST
 test2:
