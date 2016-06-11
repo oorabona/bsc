@@ -1,9 +1,13 @@
 test:
   # Yep this can also be done.
   - '$(which env)'
-  - echo $WTF
-  - env: WTF=still works!
-  - echo $WTF
-  - env: BBQ=bbq $WTF
-  - echo $BBQ
+  - |
+    echo before: $WTF
+  - env:
+      WTF: works!
+  - |
+    echo after: $WTF
+  - env: BBQ=still $WTF
+  - |
+    echo composite: $BBQ
   - echo Done.

@@ -40,6 +40,7 @@ describe 'Bootstrap tests', ->
   it 'should be able to get and set environment variables', (done) ->
     exec("#{binubs} -b test/test_env.yml test").then (p) ->
       stdout = p.stdout.toString()
+      expect(stdout).to.match /after\: works!/
       expect(stdout).to.match /composite\: still works!/
       expect(stdout).to.match /Done\./
       done()
