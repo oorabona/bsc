@@ -50,6 +50,13 @@ describe 'Bootstrap tests', ->
       done()
     , error
 
+describe 'Internal tests', ->
+  it 'should be able to run ShellJS commands without error', (done, error) ->
+    exec("#{binubs} -b test/test_internal_shell.yml all").then (p) ->
+      expect(p.stdout.toString()).to.match /All tests passed/
+      done()
+    , error
+
 describe 'Plugins', ->
   describe 'Package JSON', ->
     it 'should be able to output version from packagejson', (done, error) ->

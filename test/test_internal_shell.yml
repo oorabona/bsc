@@ -1,0 +1,74 @@
+cat:
+  - log: Testing cat...
+  - echo "some content" > file.tmp
+  - cat file.tmp
+  - rm file.tmp
+cd:
+  - log: Testing cd...
+  - cd .
+chmod:
+  - log: Testing chmod...
+  - touch file.tmp
+  - chmod 755 file.tmp
+  - rm file.tmp
+cp:
+  - log: Testing cp...
+  - echo "some content" > file.tmp
+  - cp file.tmp file2.tmp
+  - rm file.tmp file2.tmp
+dirs:
+  - log: Testing dirs...
+  - dirs
+exit:
+  - log: Testing exit...
+  - exit 0
+grep:
+  - log: Testing grep...
+  - echo "some content" > file.tmp
+  - grep some file.tmp
+ls:
+  - log: Testing ls...
+  - ls
+mkdir:
+  - log: Testing mkdir...
+  - mkdir foo
+  - rm -rf foo
+mv:
+  - log: Testing mv...
+  - touch file.tmp
+  - mv file.tmp file2.tmp
+  - rm file2.tmp
+pushd:
+  - log: Testing pushd...
+  - mkdir blah
+  - pushd blah
+popd:
+  - log: Testing popd...
+  - popd
+  - rm -rf blah
+pwd:
+  - log: Testing pwd...
+  - pwd
+sed:
+  - log: Testing sed...
+
+test:
+  - log: Testing test...
+
+all:
+  - task: cat
+  - task: cd
+  - task: chmod
+  - task: cp
+  - task: dirs
+  - task: grep
+  - task: ls
+  - task: mkdir
+  - task: mv
+  - task: pushd
+  - task: popd
+  - task: pwd
+  - task: sed
+  - task: test
+  - echo All tests passed!
+  - task: exit
