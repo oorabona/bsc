@@ -79,7 +79,7 @@ Dispatch =
       # commands, which would lead to a complete crash.
       # We'll see when that happens :)
       if pStdout
-        execSettings.stdio = [null, "inherit", process.stderr, "ipc"]
+        execSettings.stdio = [null, process.stdout, process.stderr, "ipc"]
       else
         execSettings.stdio = [null, "pipe", process.stderr, "ipc"]
 
