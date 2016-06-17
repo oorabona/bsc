@@ -128,15 +128,12 @@ run = (options) ->
       if -1 is options.tasklist.indexOf arg
         ubs.push arg
 
-    Utils.defaults build.settings,
-      ubs: ubs.join ' '
-      colors:
-        error: 'red'
-        warning: 'orange'
-        notice: 'yellow'
-        taskinfo: 'cyan'
-        info: 'green'
-        debug: 'purple'
+    build.settings = Utils.extend Config.default_settings, build.settings, {ubs: ubs.join ' '}
+
+    # Do that once
+    build.settings.platform = platform = process.platform
+    build.settings.exec?.shellCmd = build.settings.exec[platform].shellCmd
+    build.settings.exec?.shellArgs = build.settings.exec[platform].shellArgs
 
     logging.info "Build settings: #{util.inspect build.settings, undefined, 4}"
     # If we have init then parse it before all other action

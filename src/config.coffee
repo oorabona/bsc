@@ -4,6 +4,31 @@ fs = require 'fs'
 path = require 'path'
 
 module.exports = exports =
+  default_settings:
+    colors:
+      error: 'red'
+      warning: 'orange'
+      notice: 'yellow'
+      taskinfo: 'cyan'
+      info: 'green'
+      debug: 'purple'
+    exec:
+      win32:
+        shellCmd: 'cmd.exe'
+        shellArgs: '/c'
+      linux:
+        shellCmd: '/bin/sh'
+        shellArgs: '-c'
+      darwin:
+        shellCmd: '/bin/sh'
+        shellArgs: '-c'
+      freebsd:
+        shellCmd: '/bin/sh'
+        shellArgs: '-c'
+      sunos:
+        shellCmd: '/bin/sh'
+        shellArgs: '-c'
+
   SETTING_RE: /^(.*)=(.*)$/
   TASK_REGEX: /^[a-z][-a-z0-9_]*$/
   DEFAULT_TASK: 'install'

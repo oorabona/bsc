@@ -63,16 +63,6 @@ Dispatch =
       execSettings = env: settings.exec.env
       execSettings.cwd ?= process.cwd()
 
-      # Do that only first time called.
-      unless settings.exec.shellCmd
-        switch process.platform
-          when 'win32'
-            settings.exec.shellCmd = 'cmd.exe'
-            settings.exec.shellArgs = '/c'
-          else
-            settings.exec.shellCmd = '/bin/sh'
-            settings.exec.shellArgs = '-c'
-
       # We do not (yet?) handle stdin, we want to monitor stdout, to simply
       # output stderr and to receive messages from the children thru an ipc channel.
       # At the moment it is activated everytime. It might be an issue with some
