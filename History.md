@@ -1,9 +1,15 @@
+0.6.7
+=====
+* Added multi environment support
+* New syntax for exec-ing conditionally
+
 0.6.6
 =====
 * Fixed back propagation of changes in environment variables from children to parent
 * Added ```%ubs%``` variable that points to ourselves (argv[0])
 * Fixed bug of ```coffee-script``` not being available at runtime
 * Added new tests for internal shell commands
+* Added `osx` to the list of supported platforms! :smile:
 
 0.6.2
 =====

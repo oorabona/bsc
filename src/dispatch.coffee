@@ -164,4 +164,18 @@ Dispatch =
     logging[level] toLog, settings.colors[level]
     Q true
 
+for platform in ['darwin', 'freebsd', 'linux', 'sunos', 'win32']
+  do (platform) ->
+    Dispatch[platform] = (command, settings) ->
+      logging.debug "Is good #{platform} ? #{settings.platform is platform}"
+      if settings.platform is platform
+        @exec command, settings
+      else Q true
+
+    Dispatch[".#{platform}"] = (command, settings) ->
+      logging.debug "Is not #{platform} ? #{settings.platform isnt platform}"
+      if settings.platform isnt platform
+        @exec command, settings
+      else Q true
+
 module.exports = Dispatch

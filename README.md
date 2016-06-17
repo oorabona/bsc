@@ -8,18 +8,18 @@
 
 > 'Write as little code as you can'
 
-This package is another Javascript builder like [Grunt](http://gruntjs.com), [Cake](http://www.coffeescript.org) or [Gulp](http://gulpjs.com) but with YAML like [Travis CI](http://travis-ci.org) ```.travis.yml``` containing (enhanced) single line ```Makefile```-like instructions.
+This package is another Javascript builder like [Grunt](http://gruntjs.com), [Cake](http://www.coffeescript.org) or [Gulp](http://gulpjs.com) but with YAML like [Travis CI](http://travis-ci.org) `.travis.yml` containing (enhanced) single line `Makefile`-like instructions.
 
-Also, it was intended to be as simple as possible to call from ```npm run``` so that you can map ```npm``` script names to ```ubs``` counterparts. Hence the _Unified_.
+Also, it was intended to be as simple as possible to call from `npm run` so that you can map `npm` script names to `ubs` counterparts. Hence the _Unified_.
 
 ## How it works
 
 There are three kind of items you can find:
 - __init__: load plugins, holds global config etc.
 - __settings__: contains variables (which can be overridden) used by plugins, or your build process, at runtime.
-- __tasks__: a target like ```install```, ```test``` and all others...
+- __tasks__: a target like `install`, `test` and all others...
 
-You need a ```build.yml``` in your __current working directory__ and that's it.
+You need a `build.yml` in your __current working directory__ and that's it.
 
 ```shell
 $ ubs
@@ -34,13 +34,13 @@ $ ubs clean test
 
 Targets will be run in sequence and depending tasks will be automatically added.
 
-You can change ```settings``` from the commandline. E.g.:
+You can change `settings` from the commandline. E.g.:
 
 ```shell
 $ ubs test mocha.display='html'
 ```
 
-Will change the display output when calling ```mocha```, see ```mocha``` plugin for details.
+Will change the display output when calling `mocha`, see `mocha` plugin for details.
 
 You can use _dot notation_ to select a setting and this works for arrays too. E.g:
 
@@ -48,9 +48,9 @@ You can use _dot notation_ to select a setting and this works for arrays too. E.
 $ ubs clean.path[1]=foo clean
 ```
 
-Will change the second element of the ```clean``` plugin ```path``` array of items to clean.
+Will change the second element of the `clean` plugin `path` array of items to clean.
 
-Lastly, you can use environment variable ```UBS_OPTS``` to pass arguments prior to command line arguments.
+Lastly, you can use environment variable `UBS_OPTS` to pass arguments prior to command line arguments.
 I.e:
 
 ```shell
@@ -63,7 +63,7 @@ Will be expanded as:
 $ ubs -v clean.path[1]=bar clean.path[1]=foo clean
 ```
 
-The final value for ```clean.path[1]``` will be ```foo``` not ```bar```.
+The final value for `clean.path[1]` will be `foo` not `bar`.
 Precedence works like the following (from highest to lowest priority):
 - command line
 - environment variable UBS_OPTS
@@ -71,7 +71,7 @@ Precedence works like the following (from highest to lowest priority):
 - plugin defaults
 - core defaults (if they exist)
 
-For a complete list of available commands, use ```ubs --help```.
+For a complete list of available commands, use `ubs --help`.
 
 > ##Note:
 > At the moment _watch_ is not implemented, see [TODO](#TODO)
@@ -80,7 +80,7 @@ For a complete list of available commands, use ```ubs --help```.
 
 The build file is all [YAML](http://yaml.org) and follows a pattern close to Makefile.
 
-It first may contain an ```init``` part, defining global context.
+It first may contain an `init` part, defining global context.
 E.g. this is where you load [plugins](#plugins).
 
 ```yaml
@@ -96,8 +96,8 @@ init:
 
 In this example, we load all four default plugins so far.
 
-Then, the ```settings``` section where all you can set/override default values coming from default values used in plugins.
-In the following example, ```mocha``` plugin stores/retrieves its own settings from under ```mocha``` and ```clean``` plugin has also its own attribute object.
+Then, the `settings` section where all you can set/override default values coming from default values used in plugins.
+In the following example, `mocha` plugin stores/retrieves its own settings from under `mocha` and `clean` plugin has also its own attribute object.
 
 ```yaml
 # It is the place to set plugins variables. Plugins can add extra key=value
@@ -120,17 +120,18 @@ A special kind of setting, __exec__, is used to change behavior of all exec comm
 ```yaml
 settings:
   exec:
-    shellCmd: '/bin/sh'
-    shellArgs: '-c'
+    win32:
+      shellCmd: 'cmd'
+      shellArgs: ['/c', 'start', '"Unified Build System -- install"']
     env:
       CPPFLAGS: "-fPIC"
       CFLAGS: "-O3"
 ```
 
-> By default, on Windows __shellCmd__ is ```cmd.exe``` and __shellArgs__ ```/c```.
-> Otherwise, it's ```/bin/sh``` and ```-c``` respectively.
+> By default, on Windows __shellCmd__ is `cmd.exe` and __shellArgs__ `/c`.
+Otherwise, it's `/bin/sh` and `-c` respectively.
 
-And all the rest are targets. By default ```ubs``` looks for ```install```.
+And all the rest are targets. By default `ubs` looks for `install`.
 
 ```yaml
 prebuild:
@@ -139,7 +140,7 @@ prebuild:
 # variables from settings above. They are replaced in place before running command.
 build:
   - echo Building %name version %version ...
-  - coffee -o %libPath% -c %srcPath%/*.coffee
+  - '%coffee% -o %libPath% -c %srcPath%/*.coffee'
 # Sometimes you rely on other tasks, so that is the way you call them.
 # Here mocha-test is a rule created by the 'mocha' plugin
 test:
@@ -157,32 +158,73 @@ install_plugins:
   - echo Installation complete, you can 'cd %libPath%'
 ```
 
-Each sequence can either be a command to ```exec```ute, this is the default, or an action, like calling a new ```task```.
+Each sequence can either be a command to `exec`ute, this is the default, or an action, like calling a new `task`.
 
 > An empty line (with only a dash and nothing else) ends processing the current target.
 
-Except some shell commands which are executed with [shelljs](https://github.com/arturadib/shelljs), all commands are currently run with the specified shell and its attributes.
+### Shell commands
 
-__ShellJS__ handles the following common shell commands:
+By default all shell commands are run with these parameters for your host platform.
 
-- ```cat```
-- ```cd```
-- ```chmod```
-- ```cp```
-- ```dirs```
-- ```exit```
-- ```grep```
-- ```ls```
-- ```mkdir```
-- ```mv```
-- ```popd```
-- ```pushd```
-- ```pwd```
-- ```rm```
-- ```sed```
-- ```test```
+```yaml
+settings:
+  exec:
+    win32:
+      shellCmd: 'cmd.exe'
+      shellArgs: '/c'
+    linux:
+      shellCmd: '/bin/sh'
+      shellArgs: '-c'
+    darwin:
+      shellCmd: '/bin/sh'
+      shellArgs: '-c'
+    freebsd:
+      shellCmd: '/bin/sh'
+      shellArgs: '-c'
+    sunos:
+      shellCmd: '/bin/sh'
+      shellArgs: '-c'
+```
 
-Along with ```task```, you can also use one of the following builtin actions:
+> Note that `platform`, `shellCmd` and `shellArgs` are `%variables%`
+
+Also, some shell commands are hooked up and handled directly by [shelljs](https://github.com/arturadib/shelljs):
+
+- `cat`
+- `cd`
+- `chmod`
+- `cp`
+- `dirs`
+- `exit`
+- `grep`
+- `ls`
+- `mkdir`
+- `mv`
+- `popd`
+- `pushd`
+- `pwd`
+- `rm`
+- `sed`
+- `test`
+
+This has the advantage of having the same behavior on different platforms (e.g: linux and win32).
+
+Sometimes you need to perform a platform specific task.
+For that, you can prefix your call with `[platform-name]` to `exec`.
+
+If you want the negative form, you can prefix with a `.`:
+
+```yaml
+task:
+  - darwin: echo You are running on an Apple machine.
+  - .win32: echo Not running on Windows.
+```
+
+> Think of 'not' for 'dot'.
+
+### Actions
+
+Along with `task`, you can also use one of the following builtin actions:
 
 ```yaml
 - log: notice level %version%
@@ -196,7 +238,10 @@ Along with ```task```, you can also use one of the following builtin actions:
 - echo $WTF
 ```
 
-And if you want to retrieve a file from elsewhere (using [request](https://github.com/request/request)).
+## Plugins
+
+You can extend `ubs` functionalities with plugins, and call them with arguments.
+For instance, if you want to retrieve a file from elsewhere (using [request](https://github.com/request/request)).
 
 ```yaml
 init:
@@ -210,11 +255,11 @@ test:
   - grab: "%fileUrl%"
 ```
 
-Which will download the file and store it in ```grabTmpDir``` .
+Which will download the file and store it in `grabTmpDir` .
 
 ## Calling different build sequences
 
-Sometimes you might want to conditionally run a part of a build. To do so you can spawn ```ubs``` again.
+Sometimes you might want to conditionally run a part of a build. To do so you can spawn `ubs` again.
 
 That would be a typical use case:
 
@@ -227,20 +272,21 @@ test:
   - echo Test is $TEST
   # If you want to conditionally call another build you may have
   # to enclose within quotes..
-  - '[ "$TEST" = "bad" ] && %bin% -b path/to/build.yml test2'
+  # Also, %ubs% variable is automagically set for you!
+  - '[ "$TEST" = "bad" ] && %ubs% -b path/to/build.yml test2'
   # The spawned process can also back propagate environment variables
   - echo Expecting test to be $TEST
 test2:
   - env: TEST="working!"
 ```
 
-First line is plain shell scripting (will be prefixed by ```sh -c```). If and only if ```$TEST``` is equal to ```bad``` shall we change to ```working```. And we do that by spawning ourselves. Most shells set ```$_``` to refer the executable name you entered in the shell, but if not the case you may use a setting (here ```bin```) to make sure the correct command is run.
+First line is plain shell scripting (will be prefixed by `sh -c`). If and only if `$TEST` is equal to `bad` shall we change to `working`. And we do that by spawning ourselves. Most shells set `$_` to refer the executable name you entered in the shell, but if not the case you may use a setting (here `bin`) to make sure the correct command is run.
 
 ### Notes
 
-Everything in the ```build.yml``` is holy, so plugins will never alter your settings. On the contrary, they are meant to provide default _workable_ functionality but if needed, everything can be overridden.
+Everything in the `build.yml` is holy, so plugins will never alter your settings. On the contrary, they are meant to provide default _workable_ functionality but if needed, everything can be overridden.
 
-This also means that if a rule exists in your ```build.yml``` file that also exists in a plugin, your version will take over the default from plugin.
+This also means that if a rule exists in your `build.yml` file that also exists in a plugin, your version will take over the default from plugin.
 
 ```yaml
 init:
@@ -250,28 +296,28 @@ clean:
   - echo FUBAR!
 ```
 
-In the above example, overriding 'clean' target will short circuit plugins' ```clean``` target, and therefore you will see the holy _FUBAR!_ message _instead_ of having your project a bit cleaned up.
+In the above example, overriding 'clean' target will short circuit plugins' `clean` target, and therefore you will see the holy _FUBAR!_ message _instead_ of having your project a bit cleaned up.
 
 ## Plugins
 
-As our ```clean``` rule above, some tasks are repetitive and could be nicely reused. So this is where ```plugins``` come into play !
+As our `clean` rule above, some tasks are repetitive and could be nicely reused. So this is where `plugins` come into play !
 
-Basically a plugin can be either a ```.coffee``` file, a ```.js``` file or a ```.yaml``` file.
+Basically a plugin can be either a `.coffee` file, a `.js` file or a `.yaml` file.
 
 Each plugin can define these parameters:
 
 Type | Use | Return type | If a function, signature
 -----|-----|-------------|-------------------------
-settings | All your settings belong to here | ```String``` or ```Object``` | ```settings(currentSettings) {}```
-rules | All tasks/targets to be added to the build file | ```String``` or ```Object``` | ```rules(settings) {}```
-actions | Add functionality with new prefixes for tasks definitions (steps) | ```Promise``` | ```actions(logging, config, helpers) {}```
+settings | All your settings belong to here | `String` or `Object` | `settings(currentSettings) {}`
+rules | All tasks/targets to be added to the build file | `String` or `Object` | `rules(settings) {}`
+actions | Add functionality with new prefixes for tasks definitions (steps) | `Promise` | `actions(logging, config, helpers) {}`
 
-The plugin architecture accepts both ```String``` and ```Object``` in return for
-both ```settings``` and ```rules```.
+The plugin architecture accepts both `String` and `Object` in return for
+both `settings` and `rules`.
 
-If an ```Object``` is returned it will be merged as-is.
+If an `Object` is returned it will be merged as-is.
 
-If a ```String``` is returned it will be parsed as YAML before merge.
+If a `String` is returned it will be parsed as YAML before merge.
 
 > A single plugin can combine any of the three parameters.
 > These parameters can be defined either _statically_ or you can scope them as functions.
@@ -320,21 +366,21 @@ Nice, isn't it ?
   """
 ```
 
-The rule ```mocha-test``` is semantically equivalent to:
+The rule `mocha-test` is semantically equivalent to:
 
 ```yaml
 - %mocha.bin% -R %mocha.display% %mocha.options%
 ```
 
-But by writing a script, we ease the process of conditions. This is a simple example but with either  ```Coffeescript``` or ```Javascript``` you will be able to have better control over what will be run. Including ```require``` other modules. Plugins are run within a [sandbox-runner](https://github.com/timnew/sandbox-runner).
+But by writing a script, we ease the process of conditions. This is a simple example but with either  `Coffeescript` or `Javascript` you will be able to have better control over what will be run. Including `require` other modules. Plugins are run within a [sandbox-runner](https://github.com/timnew/sandbox-runner).
 
-> Due to the sandbox nature of the plugin, these parameters (```settings```, ```rules```, ```actions```) must be set within the ```this``` context.
+> Due to the sandbox nature of the plugin, these parameters (`settings`, `rules`, `actions`) must be set within the `this` context.
 
-After parsing, ```settings``` and ```rules``` will be evaluated either as a function or as a Plain Old Object.
+After parsing, `settings` and `rules` will be evaluated either as a function or as a Plain Old Object.
 
-> __NOTE:__ ```rules``` will be evaluated right after merging settings so if your plugin
+> __NOTE:__ `rules` will be evaluated right after merging settings so if your plugin
 relies on some configuration option another plugin defines, you have to make sure you
-ordered plugins loading correctly ! (see ```init```)
+ordered plugins loading correctly ! (see `init`)
 
 ### Require example
 
@@ -354,7 +400,7 @@ As you can see, you can do pretty much anything you want to customize your own b
 
 ### Using actions
 
-Actions are set like ```settings``` or ```rules``` but have slight differences.
+Actions are set like `settings` or `rules` but have slight differences.
 
 An example to start with:
 
@@ -364,14 +410,14 @@ An example to start with:
     # Do stuff (see src/plugins/ubs-grab.coffee)
 ```
 
-When plugin is loaded, if ```actions``` exists, it must be a function. This function will be called by the plugin manager with two parameters:
+When plugin is loaded, if `actions` exists, it must be a function. This function will be called by the plugin manager with two parameters:
 - logging: internal __logging__ instance
 - config: internal __config__ instance
 - helpers: internal __utils__ instance
 
-You may have more than one ```action``` defined by a plugin but you cannot redefine an existing action (like ```exec``` for example).
+You may have more than one `action` defined by a plugin but you cannot redefine an existing action (like `exec` for example).
 
-Each action take two parameters, the ```command``` is the full line from the build file, with ```%...%```, and the ```settings```.
+Each action take two parameters, the `command` is the full line from the build file, with `%...%`, and the `settings`.
 To process automatically these templates, you need to call from __inside__ your action:
 
 ```coffee
@@ -387,11 +433,11 @@ command = helpers.parseCommand command, settings, (settingValue) ->
   else settingValue
 ```
 
-This callback can also be used to ```throw Error``` if needed.
+This callback can also be used to `throw Error` if needed.
 
-> ```actions``` function must return an object. That object will extend existing [Dispatch](https://github.com/oorabona/ubs/tree/master/src/dispatch.coffee) object.
+> `actions` function must return an object. That object will extend existing [Dispatch](https://github.com/oorabona/ubs/tree/master/src/dispatch.coffee) object.
 
-> Actions will be run within the __Dispatch__ context and therefore must comply with the existing [Q Promises](https://github.com/kriskowal/q). So each defined action must return a promise and that promise must be either ```resolved``` or ```rejected```.
+> Actions will be run within the __Dispatch__ context and therefore must comply with the existing [Q Promises](https://github.com/kriskowal/q). So each defined action must return a promise and that promise must be either `resolved` or `rejected`.
 
 ## Bugs
 

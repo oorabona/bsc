@@ -54,6 +54,20 @@ describe 'Bootstrap tests', ->
       done()
     , error
 
+  # Detect platform and `exec` conditionally commands
+  it 'should be able to detect host platform and run conditionally', (done, error) ->
+    exec("#{binubs} -b test/test_host_platform.yml test").then (p) ->
+      stdout = p.stdout.toString()
+      regexp = /Apple\./
+      expect(stdout).to.match new RegExp "#{process.platform}",'i'
+      expect(stdout).to.match new RegExp "=#{process.platform}=",'i'
+      if process.platform is 'darwin'
+        expect(stdout).to.not.match regexp
+      else
+        expect(stdout).to.match regexp
+      done()
+    , error
+
 describe 'Internal tests', ->
   it 'should be able to run ShellJS commands without error', (done, error) ->
     exec("#{binubs} -b test/test_internal_shell.yml all").then (p) ->

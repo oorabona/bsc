@@ -1,0 +1,10 @@
+settings:
+  platform: 'unknown'
+test:
+  - |
+    echo Found platform: %platform%
+  - linux: 'echo =linux= $(cat /proc/cpuinfo)'
+  - win32: |-
+      echo =win32=
+      ipconfig /all
+  - .darwin: echo For sure not an Apple.
