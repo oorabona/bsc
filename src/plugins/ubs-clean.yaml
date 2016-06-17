@@ -5,7 +5,7 @@ settings:
     path: ['lib']
     distclean: ['node_modules']
 clean:
-  - exec: rm -rf %clean.path%
+  - rm -rf %clean.path%
 distclean:
   - task: clean
-  - exec: rm -rf %clean.distclean%
+  - rm -rf %clean.distclean%
