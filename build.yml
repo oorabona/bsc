@@ -28,9 +28,14 @@ build:
 test:
   - echo Running test suites...
   - task: mocha-test
+# Prepare installation (i.e. install package dependencies)
+prepare:
+  - npm i
+
 # Splitted install and install_plugins because building UBS requires these plugins
 # to be installed first hand. This build.yml needs them in their expected places.
 install:
+  - '[ -d node_modules ] || %ubs% prepare'
   - task: build
   - task: install_plugins
 install_plugins:
