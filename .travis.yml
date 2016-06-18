@@ -14,5 +14,5 @@ install:
   # Ensure source install works and compiles correctly
   - npm install
   # test our module
-  - UBS_OPTS="-D" npm test
+  - UBS_OPTS="-D" ./bin/ubs test
 after_success:
