@@ -35,7 +35,7 @@ install:
   - npm install
 
 test_script:
-  - IF "%nwjs_version%" == "" npm test
+  - IF "%nwjs_version%" == "" .\bin\ubs test
   - IF NOT "%nwjs_version%" == "" pushd test\nwjs && (..\..\node_modules\.bin\nw & node exitcode.js & popd)
 
 build: off

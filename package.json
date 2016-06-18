@@ -4,7 +4,6 @@
   "description": "Unified Build System",
   "main": "./lib/ubs",
   "scripts": {
-    "test": "./bin/ubs test",
     "prepublish": "./node_modules/.bin/coffee -b -c -o lib/ src/ && cp src/plugins/*.yaml lib/plugins/"
   },
   "repository": {
