@@ -76,9 +76,12 @@ Dispatch =
       stdout = ""
       exitCode = 0
 
-      command = [ settings.exec.shellCmd, settings.exec.shellArgs, command ]
+      # Flatten shellArgs and merge the whole command array
+      cmdShell = settings.exec.shellCmd
+      cmdArgs.push settings.exec.shellArgs
+      cmdArgs.push command
 
-      p = child_process.spawn command[0], command[1...], execSettings
+      p = child_process.spawn cmdShell, cmdArgs, execSettings
       logging.debug "spawn #{p.pid}: #{util.inspect(command)}"
 
       p.on 'error', (error) ->
@@ -135,7 +138,6 @@ Dispatch =
       else
         throw new Error "Invalid environment setting: #{command}"
     else
-      # Utils.extend envSettings, command
       logging.debug "Environment: #{util.inspect command, undefined, 4}"
       Q [true, command]
 

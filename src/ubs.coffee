@@ -128,12 +128,23 @@ run = (options) ->
       if -1 is options.tasklist.indexOf arg
         ubs.push arg
 
+    console.log 'build.settings', build.settings
     build.settings = Utils.extend Config.default_settings, build.settings, {ubs: ubs.join ' '}
 
-    # Do that once
+    # Do that once per run. We make sure we have an array of arguments.
     build.settings.platform = platform = process.platform
-    build.settings.exec?.shellCmd = build.settings.exec[platform].shellCmd
-    build.settings.exec?.shellArgs = build.settings.exec[platform].shellArgs
+    build.settings.exec.shellCmd = build.settings.exec[platform].shellCmd
+    cmdArgs = build.settings.exec[platform].shellArgs
+
+    switch Utils.toType cmdArgs
+      when 'array'
+        cmdArgs = settings.exec.shellArgs
+      when 'string'
+        cmdArgs = settings.exec.shellArgs.split ' '
+      else
+        throw new Error "Unexpected type for shellArgs: expected String or Array."
+
+    build.settings.exec.shellArgs = cmdArgs
 
     logging.info "Build settings: #{util.inspect build.settings, undefined, 4}"
     # If we have init then parse it before all other action
