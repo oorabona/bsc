@@ -1,0 +1,9 @@
+*.log
+*.gz
+core
+build/
+test/
+.travis*
+appveyor.yml
+.npmignore
+.gitignore
