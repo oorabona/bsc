@@ -2,7 +2,6 @@ init:
   plugins:
     - "grab"
 settings:
-  # File does not exists, so we minimize download size and still get a result in body!
   fileUrl: 'https://github.com/oorabona/ubs/archive/master.zip'
   target: 'test/master.zip'
   targetDir: 'test/'
