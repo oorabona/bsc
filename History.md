@@ -1,3 +1,9 @@
+0.6.8
+=====
+* Fixed `shellArgs` so that it accepts `strings` and `arrays`
+* Updated `grab` plugin calling method to accept string and array based parameters.
+* `parseCommand` now accept commands in string or array fashion
+
 0.6.7
 =====
 * Added multi environment support

@@ -122,7 +122,7 @@ settings:
   exec:
     win32:
       shellCmd: 'cmd'
-      shellArgs: ['/c', 'start', '"Unified Build System -- install"']
+      shellArgs: "/c 'start' '"Unified Build System -- install"'"
     env:
       CPPFLAGS: "-fPIC"
       CFLAGS: "-O3"
@@ -188,6 +188,27 @@ settings:
 
 > Note that `platform`, `shellCmd` and `shellArgs` are `%variables%`
 
+You might want to tweak them, here is how you do:
+
+```shell
+$ ubs test exec.linux.shellArgs="-c -x"
+```
+
+Or in `build.yml`:
+
+```yaml
+settings:
+  exec:
+    win32:
+      shellArgs:
+        - /c
+        - start
+    linux:
+      shellArgs:
+        - -c
+        - -x
+```
+
 Also, some shell commands are hooked up and handled directly by [shelljs](https://github.com/arturadib/shelljs):
 
 - `cat`
@@ -238,25 +259,6 @@ Along with `task`, you can also use one of the following builtin actions:
 - echo $WTF
 ```
 
-## Plugins
-
-You can extend `ubs` functionalities with plugins, and call them with arguments.
-For instance, if you want to retrieve a file from elsewhere (using [request](https://github.com/request/request)).
-
-```yaml
-init:
-  plugins:
-    - "grab"
-settings:
-  fileUrl: https://github.com/oorabona/ubs/archive/master.zip
-  grabTmpDir: test
-test:
-  - echo Retrieving %fileUrl%
-  - grab: "%fileUrl%"
-```
-
-Which will download the file and store it in `grabTmpDir` .
-
 ## Calling different build sequences
 
 Sometimes you might want to conditionally run a part of a build. To do so you can spawn `ubs` again.
@@ -282,10 +284,29 @@ test2:
 
 First line is plain shell scripting (will be prefixed by `sh -c`). If and only if `$TEST` is equal to `bad` shall we change to `working`. And we do that by spawning ourselves. Most shells set `$_` to refer the executable name you entered in the shell, but if not the case you may use a setting (here `bin`) to make sure the correct command is run.
 
-### Notes
+## Plugins
 
-Everything in the `build.yml` is holy, so plugins will never alter your settings. On the contrary, they are meant to provide default _workable_ functionality but if needed, everything can be overridden.
+You can extend `ubs` functionalities with plugins, and call them with arguments.
+For instance, if you want to retrieve a file from elsewhere (using [request](https://github.com/request/request)).
 
+```yaml
+init:
+  plugins:
+    - "grab"
+settings:
+  fileUrl: https://github.com/oorabona/ubs/archive/master.zip
+test:
+  - echo Retrieving %fileUrl%
+  - grab: "%fileUrl% %grabTmpDir%"
+  - rm %target%
+  - grab:
+      remoteUrl: '%fileUrl%'
+      localTarget: '%targetDir%'
+```
+
+Which will download the file and store it in `grabTmpDir` .
+
+>Everything in the `build.yml` is holy, so plugins will never alter your settings. On the contrary, they are meant to provide default _workable_ functionality but if needed, everything can be overridden.
 This also means that if a rule exists in your `build.yml` file that also exists in a plugin, your version will take over the default from plugin.
 
 ```yaml
@@ -296,11 +317,7 @@ clean:
   - echo FUBAR!
 ```
 
-In the above example, overriding 'clean' target will short circuit plugins' `clean` target, and therefore you will see the holy _FUBAR!_ message _instead_ of having your project a bit cleaned up.
-
-## Plugins
-
-As our `clean` rule above, some tasks are repetitive and could be nicely reused. So this is where `plugins` come into play !
+In the above example, overriding `clean` target will short circuit plugins' definition of `clean` target, and therefore you will see the holy _FUBAR!_ message _instead_ of having your project a bit cleaned up.
 
 Basically a plugin can be either a `.coffee` file, a `.js` file or a `.yaml` file.
 
@@ -411,9 +428,9 @@ An example to start with:
 ```
 
 When plugin is loaded, if `actions` exists, it must be a function. This function will be called by the plugin manager with two parameters:
-- logging: internal __logging__ instance
-- config: internal __config__ instance
-- helpers: internal __utils__ instance
+- logging: internal __Logging__ instance
+- config: internal __Config__ instance
+- helpers: internal __Utils__ instance
 
 You may have more than one `action` defined by a plugin but you cannot redefine an existing action (like `exec` for example).
 
@@ -423,6 +440,9 @@ To process automatically these templates, you need to call from __inside__ your 
 ```coffee
 command = helpers.parseCommand command, settings
 ```
+
+> `parseCommand` accepts string command and array command. It will return its
+results using the same type.
 
 If you need special care about how you handle tokenization everytime plugin command is parsed, e.g. variable can be an array, or some exotic type, then a callback is provided.
 

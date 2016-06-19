@@ -1,10 +1,10 @@
 {
   "name": "ubs",
-  "version": "0.6.7",
+  "version": "0.6.8",
   "description": "Unified Build System",
   "main": "./lib/ubs",
   "scripts": {
-    "prepublish": "./node_modules/.bin/coffee -b -c -o lib/ src/ && cp src/plugins/*.yaml lib/plugins/"
+    "prepublish": "./node_modules/.bin/coffee -b -c -o lib/ src/ && ./bin/ubs install_plugins"
   },
   "repository": {
     "type": "git",
