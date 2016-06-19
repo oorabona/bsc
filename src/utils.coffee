@@ -93,25 +93,40 @@ parseCommand = (command, settings, callback) ->
   if typeof callback isnt 'function'
     callback = (v) -> v
 
-  matches = command.match Config.REPLACE_SETTING_RE
+  if 'string' isnt typeof command and 'array' isnt toType command
+    throw new Error "Bad invocation of parseCommand: (command: [String or Array], settings: Object, callback: Function)"
 
-  if matches
-    matches.forEach (settingToReplace) ->
-      # Remove leading and trailing '%'
-      lookupSetting = settingToReplace[1...-1]
+  # To preserve same type for caller, we will return a string if we were given
+  # a string and an array for an array.
+  if 'string' is typeof command
+    isString = true
+    commands = [ command ]
+  else
+    isString = false
+    commands = command
 
-      # See what we have in our dictionary and let the calling function be notified.
-      # Callback can update settingValue if needed.
-      settingValue = callback resolve settings, lookupSetting
+  results = commands.map (command) ->
+    matches = command.match Config.REPLACE_SETTING_RE
 
-      if settingValue
-        logging.debug "Found token to lookup #{lookupSetting}: #{settingValue}"
-      else
-        throw new Error "Setting '#{lookupSetting}' not found for command '#{command}!'"
+    if matches
+      matches.forEach (settingToReplace) ->
+        # Remove leading and trailing '%'
+        lookupSetting = settingToReplace[1...-1]
 
-      command = command.replace settingToReplace, settingValue
+        # See what we have in our dictionary and let the calling function be notified.
+        # Callback can update settingValue if needed.
+        settingValue = callback resolve settings, lookupSetting
 
-  command
+        if settingValue
+          logging.debug "Found token to lookup #{lookupSetting}: #{settingValue}"
+        else
+          throw new Error "Setting '#{lookupSetting}' not found for command '#{command}!'"
+
+        command = command.replace settingToReplace, settingValue
+
+    command
+
+  if isString then results[0] else results
 
 # Adapted from https://stackoverflow.com/questions/586182/how-do-i-insert-an-item-into-an-array-at-a-specific-index
 # What:
