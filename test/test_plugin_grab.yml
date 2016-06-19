@@ -2,15 +2,16 @@ init:
   plugins:
     - "grab"
 settings:
+  # File does not exists, so we minimize download size and still get a result in body!
   fileUrl: 'https://github.com/oorabona/ubs/archive/master.zip'
-  grabTmpDir: test
   target: 'test/master.zip'
+  targetDir: 'test/'
 
 test:
   - log: Checking whether we have curl or wget somewhere...
   - |
-    c=$(which curl)
-    w=$(which wget)
+    c=$(which curl1)
+    w=$(which wget1)
     if [ "$c" != "" ]
     then
       %ubs% using=$c curl
@@ -33,4 +34,8 @@ wget:
 grab:
   - log:
       warning: Neither curl nor wget could be found! Using internal grab...
-  - grab: "%fileUrl%"
+  - grab: "%fileUrl% %target%"
+  - rm %target%
+  - grab:
+      remoteUrl: '%fileUrl%'
+      localTarget: '%targetDir%'

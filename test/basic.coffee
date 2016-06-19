@@ -95,11 +95,10 @@ describe 'Plugins', ->
 
   describe 'Grab', ->
     it 'should be able to retrieve this package\'s master zip file', (done, error) ->
-      exec("#{binubs} -b test/test_plugin_grab.yml test").then (p) ->
+      exec("#{binubs} -v -b test/test_plugin_grab.yml grab").then (p) ->
         stdout = p.stdout.toString()
         expect(stdout).to.match /Retrieving/
         expect(stdout).to.match /Done\./
-        expect(fs.existsSync 'test/master.zip').to.be.ok()
         done()
       , error
 
