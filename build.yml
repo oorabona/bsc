@@ -31,6 +31,9 @@ test:
 # Prepare installation (i.e. install package dependencies)
 prepare:
   - npm i
+verify:
+  - echo Verify %name% version %version%. Make sure versions match.
+  - ./bin/ubs --version
 
 # Splitted install and install_plugins because building UBS requires these plugins
 # to be installed first hand. This build.yml needs them in their expected places.
