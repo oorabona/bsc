@@ -130,7 +130,16 @@ defaults = (src, ref) ->
 
   src
 
+# https://stackoverflow.com/questions/11060631/how-do-i-clone-copy-an-instance-of-an-object-in-coffeescript
+clone = (obj) ->
+  return obj  if obj is null or typeof (obj) isnt "object"
+  temp = new obj.constructor()
+  for key of obj
+    temp[key] = clone(obj[key])
+  temp
+
 module.exports = exports = {
+  clone: clone
   defaults: defaults
   toType: toType
   recursiveMerge: recursiveMerge
