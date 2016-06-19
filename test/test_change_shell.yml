@@ -1,0 +1,20 @@
+settings:
+  exec:
+    win32:
+      shellArgs:
+        - /c
+        - start
+    linux:
+      shellArgs:
+        - -c
+        - -x
+test:
+  - |
+    echo Found platform: %platform%
+    echo ShellCmd: %exec.shellCmd%
+    echo ShellArgs: %exec.shellArgs%
+  - linux: 'echo =linux='
+  - win32: |-
+      echo =win32=
+      ipconfig /all
+  - .darwin: echo For sure not an Apple.

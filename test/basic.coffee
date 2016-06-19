@@ -75,6 +75,14 @@ describe 'Internal tests', ->
       done()
     , error
 
+  it 'must respect variable override precedence', (done, error) ->
+    exec("UBS_OPTS=-D #{binubs} -b test/test_change_shell.yml test exec.linux.shellArgs='-c' exec.win32.shellArgs='/c'").then (p) ->
+      stdout = p.stdout.toString()
+      expect(stdout).to.match /--debug/
+      expect(stdout).to.not.match /shellArgs.*[x|start]$/
+      done()
+    , error
+
 describe 'Plugins', ->
   describe 'Package JSON', ->
     it 'should be able to output version from packagejson', (done, error) ->

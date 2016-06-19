@@ -128,7 +128,6 @@ run = (options) ->
       if -1 is options.tasklist.indexOf arg
         ubs.push arg
 
-    console.log 'build.settings', build.settings
     build.settings = Utils.extend Config.default_settings, build.settings, {ubs: ubs.join ' '}
 
     # Do that once per run. We make sure we have an array of arguments.
@@ -138,9 +137,9 @@ run = (options) ->
 
     switch Utils.toType cmdArgs
       when 'array'
-        cmdArgs = settings.exec.shellArgs
+        break
       when 'string'
-        cmdArgs = settings.exec.shellArgs.split ' '
+        cmdArgs = cmdArgs.split ' '
       else
         throw new Error "Unexpected type for shellArgs: expected String or Array."
 

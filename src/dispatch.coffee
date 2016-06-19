@@ -76,9 +76,12 @@ Dispatch =
       stdout = ""
       exitCode = 0
 
-      # Flatten shellArgs and merge the whole command array
+      # Flatten shellArgs and merge the whole command array.
+      # We need to clone shellArgs each time to avoid mishaps.
+      # NOTE: this would be useful to concatenate commands (i.e: make a script)
+      # instead of spawning each time a shell.
       cmdShell = settings.exec.shellCmd
-      cmdArgs.push settings.exec.shellArgs
+      cmdArgs = Utils.clone settings.exec.shellArgs
       cmdArgs.push command
 
       p = child_process.spawn cmdShell, cmdArgs, execSettings
