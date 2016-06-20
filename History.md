@@ -1,3 +1,9 @@
+0.7.0
+=====
+* Moved plugins from main code to `ubs-plugins` package
+* Added variable substition pre-process with enclosing and separator facilities
+* Fixed grab test
+
 0.6.8
 =====
 * Fixed `shellArgs` so that it accepts `strings` and `arrays`

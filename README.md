@@ -136,7 +136,7 @@ And all the rest are targets. By default `ubs` looks for `install`.
 ```yaml
 prebuild:
   - npm update
-# You can call shell commands as well. In the build task, %name and %version are
+# You can call shell commands as well. In the build task, %name% and %version% are
 # variables from settings above. They are replaced in place before running command.
 build:
   - echo Building %name version %version ...
@@ -161,6 +161,48 @@ install_plugins:
 Each sequence can either be a command to `exec`ute, this is the default, or an action, like calling a new `task`.
 
 > An empty line (with only a dash and nothing else) ends processing the current target.
+
+### Variable substitution
+
+Variables are defined in the `settings` section of the build file.
+You can reference them everywhere in your scripts.
+
+For instance:
+
+```yaml
+settings:
+  nodes:
+    ips:
+      - '1.2.3.4:5'
+      - '6.7.8.9:10'
+test:
+  - |-
+    echo %nodes.ips%
+    echo %nodes.ips:q%
+    echo %nodes.ips:dq:cm%
+  - log: Done!
+```
+
+Outputs:
+
+```sh
+1.2.3.4:5 6.7.8.9:10
+'1.2.3.4:5' '6.7.8.9:10'
+"1.2.3.4:5", "6.7.8.9:10"
+Done!
+```
+
+So a variable name must be enclosed in `%variable:enclosing:separator%`, where:
+- variable: The variable name in JSON notation (i.e.: it accepts dots and indices)
+- enclosing: after resolution, enclose value (or each value in case of `Array`) with:
+  * `q`: quotes
+  * `dq`: double quotes
+- separator: after resolution and in case of `Array`, use this separator between values:
+  * `cm`: comma separated values
+  * `cln`: colon separated values
+  * `sc`: semi colon separated values
+
+> Note that, if a variable is undefined, invoking it will return the string `undefined`
 
 ### Shell commands
 
@@ -295,6 +337,7 @@ init:
     - "grab"
 settings:
   fileUrl: https://github.com/oorabona/ubs/archive/master.zip
+  grabTmpDir: 'download/'
 test:
   - echo Retrieving %fileUrl%
   - grab: "%fileUrl% %grabTmpDir%"
@@ -453,7 +496,7 @@ command = helpers.parseCommand command, settings, (settingValue) ->
   else settingValue
 ```
 
-This callback can also be used to `throw Error` if needed.
+This callback can also be used to validate further and `throw Error` if needed.
 
 > `actions` function must return an object. That object will extend existing [Dispatch](https://github.com/oorabona/ubs/tree/master/src/dispatch.coffee) object.
 
