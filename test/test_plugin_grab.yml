@@ -2,8 +2,8 @@ init:
   plugins:
     - "grab"
 settings:
-  fileUrl: 'https://github.com/oorabona/ubs/archive/master.zip'
-  target: 'test/master.zip'
+  fileUrl: 'https://google.com'
+  target: 'test/google.html'
   targetDir: 'test/'
 
 test:

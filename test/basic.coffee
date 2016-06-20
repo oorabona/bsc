@@ -114,4 +114,4 @@ describe 'Plugins', ->
 
   after ->
     # We completed our task, remove created files
-    fs.unlinkSync 'test/master1.zip'
+    fs.unlinkSync 'test/google.com'
