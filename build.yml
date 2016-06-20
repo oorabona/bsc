@@ -40,9 +40,3 @@ verify:
 install:
   - '[ -d node_modules ] || %ubs% prepare'
   - task: build
-  - task: install_plugins
-install_plugins:
-  - echo Copying YAML plugins to %libPath%/plugins/ folder
-  - cp -f %srcPath%/plugins/*.yaml %libPath%/plugins/
-  - echo Copying JS plugins to %libPath%/plugins/ folder
-  - cp -f %srcPath%/plugins/*.js %libPath%/plugins/

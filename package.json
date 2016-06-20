@@ -4,7 +4,7 @@
   "description": "Unified Build System",
   "main": "./lib/ubs",
   "scripts": {
-    "prepublish": "./node_modules/.bin/coffee -b -c -o lib/ src/ && ./bin/ubs install_plugins"
+    "prepublish": "./node_modules/.bin/coffee -b -c -o lib/ src/"
   },
   "repository": {
     "type": "git",
@@ -43,7 +43,8 @@
     "request": "latest",
     "sandbox-runner": "latest",
     "shelljs": "latest",
-    "sprintf": "latest"
+    "sprintf": "latest",
+    "ubs-plugins": "^1.0.0"
   },
   "files": [
     "build.yml",
