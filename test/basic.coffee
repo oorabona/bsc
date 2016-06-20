@@ -83,6 +83,15 @@ describe 'Internal tests', ->
       done()
     , error
 
+  it 'must be able to pre-process variables', (done, error) ->
+    exec("#{binubs} -b test/test_variables.yml test").then (p) ->
+      stdout = p.stdout.toString()
+      expect(stdout).to.match /Done\!/
+      expect(stdout).to.match /\'/
+      expect(stdout).to.match /\"[^,]*\,[^\"]*\"/
+      done()
+    , error
+
 describe 'Plugins', ->
   describe 'Package JSON', ->
     it 'should be able to output version from packagejson', (done, error) ->

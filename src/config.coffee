@@ -33,7 +33,7 @@ module.exports = exports =
   TASK_REGEX: /^[a-z][-a-z0-9_]*$/
   DEFAULT_TASK: 'install'
 
-  REPLACE_SETTING_RE: /\%(\w[\[\]\-\.\w]*)\%/g
+  REPLACE_SETTING_RE: /\%(\w[\[\]\:\-\.\w]*)\%/g
 
   DEFAULT_BUILD_FILE: 'build.yml'
 

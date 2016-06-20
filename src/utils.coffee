@@ -113,9 +113,48 @@ parseCommand = (command, settings, callback) ->
         # Remove leading and trailing '%'
         lookupSetting = settingToReplace[1...-1]
 
+        # Split command in left and right with separator ':'
+        matches = lookupSetting.split ':'
+        if matches.length > 1
+          variableName = matches[0]
+          options = matches[1]
+          separator = matches[2]
+          # If we have non falsy options, we look which one
+          resolvedVariable = resolve settings, variableName
+          if !!options
+            switch options
+              when 'q'  # quotes
+                enclose = '\''
+              when 'dq' # double quotes
+                enclose = '\"'
+              else
+                throw new Error "Could not interpret #{options} in #{settingToReplace}"
+          else enclose = ''
+          if !!separator
+            switch separator
+              when 'cm'  # comma
+                separator = ','
+              when 'cln' # colon
+                separator = ':'
+              when 'sc'  # semi colon
+                separator = ';'
+              else
+                throw new Error "Could not interpret #{separator} in #{settingToReplace}"
+          else separator = ''
+
+          if 'array' is toType resolvedVariable
+            resolvedVariable = resolvedVariable.map (el,index) ->
+              if index < resolvedVariable.length - 1
+                sep = separator
+              else sep = ''
+              "\\#{enclose}#{el}\\#{enclose}#{sep}"
+
+        else
+          resolvedVariable = resolve settings, lookupSetting
+
         # See what we have in our dictionary and let the calling function be notified.
         # Callback can update settingValue if needed.
-        settingValue = callback resolve settings, lookupSetting
+        settingValue = callback resolvedVariable
 
         if settingValue
           logging.debug "Found token to lookup #{lookupSetting}: #{settingValue}"
