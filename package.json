@@ -44,7 +44,7 @@
     "sandbox-runner": "latest",
     "shelljs": "latest",
     "sprintf": "latest",
-    "ubs-plugins": "^1.0.0"
+    "ubs-plugins": "latest"
   },
   "files": [
     "build.yml",
