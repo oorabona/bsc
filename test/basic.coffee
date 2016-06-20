@@ -89,6 +89,7 @@ describe 'Internal tests', ->
       expect(stdout).to.match /Done\!/
       expect(stdout).to.match /\'/
       expect(stdout).to.match /\"[^,]*\,[^\"]*\"/
+      expect(stdout).to.match /\'localhost:8888\'/
       done()
     , error
 
@@ -107,10 +108,10 @@ describe 'Plugins', ->
       exec("#{binubs} -v -b test/test_plugin_grab.yml grab").then (p) ->
         stdout = p.stdout.toString()
         expect(stdout).to.match /Retrieving/
-        expect(stdout).to.match /Done\./
+        expect(stdout).to.match /statusCode/
         done()
       , error
 
   after ->
     # We completed our task, remove created files
-    fs.unlinkSync 'test/master.zip'
+    fs.unlinkSync 'test/master1.zip'

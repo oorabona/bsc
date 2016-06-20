@@ -148,7 +148,8 @@ parseCommand = (command, settings, callback) ->
                 sep = separator
               else sep = ''
               "\\#{enclose}#{el}\\#{enclose}#{sep}"
-
+          else
+            resolvedVariable = "\\#{enclose}#{resolvedVariable}\\#{enclose}"
         else
           resolvedVariable = resolve settings, lookupSetting
 
